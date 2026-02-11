@@ -28,6 +28,8 @@ namespace NNT_Archipealgo
         public static Dictionary<ArchipelagoItem, int> itemQueue = [];
         public static float itemQueueTimer = -1;
 
+        public static System.Random rng = new();
+
         private void Awake()
         {
             // Set up the logger.
