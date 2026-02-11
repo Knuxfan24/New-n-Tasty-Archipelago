@@ -1,0 +1,108 @@
+﻿using HarmonyLib;
+
+namespace NNT_Archipealgo.Patchers
+{
+    internal class AbePatcher
+    {
+        /// <summary>
+        /// Whether or not we have a DeathLink queued.
+        /// </summary>
+        public static bool hasBufferedDeathLink;
+
+        /// <summary>
+        /// Whether or not we can send a DeathLink out.
+        /// </summary>
+        public static bool canSendDeathLink = true;
+
+        /// <summary>
+        /// How much amnesty we have before we send out a DeathLink.
+        /// </summary>
+        public static int deathLinkAmnesty = 10;
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Abe), "RespawnStartEnter")]
+        private static void EnableDeathLinkOnRespawn() => canSendDeathLink = true;
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(App), "LoadQuickSave")]
+        private static void EnableDeathLinkOnSaveLoad(ref bool ___m_bQuickLoadPending)
+        {
+            if (___m_bQuickLoadPending) canSendDeathLink = true;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Abe), "Update")]
+        static void ReceiveDeathLink(Abe __instance)
+        {
+            // Check that we have a DeathLink waiting to come in.
+            if (hasBufferedDeathLink)
+            {
+                // Remove the DeathLink flag.
+                hasBufferedDeathLink = false;
+
+                // Stop any of Abe's voice lines.
+                AkSoundEngine.PostEvent("Stop_abe_vo", __instance.gameObject);
+
+                // Set Abe to his death explosion state.
+                __instance.ReInitStateMachine(JAWStateMachine.SMStates.AbeDeathExplosion);
+
+                // If any Mudokons are following Abe, then have the first one make a voice line.
+                if (__instance.Followers.Count > 0)
+                    AkSoundEngine.PostEvent("Play_vox_mudslave_death_response_abe", __instance.Followers[0].gameObject);
+
+                // Play the death jingle.
+                App.musicsystem.PostMusicTrigger("trigger_death");
+            }
+        }
+
+        // TODO: Replace the __args with a ref to the actual argument we want.
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Abe), "Kill")]
+        static void SendDeathLink(object[] __args)
+        {
+            // Only do any of this if we can send a DeathLink and have it enabled.
+            if (!canSendDeathLink || (long)Plugin.slotData["death_link"] == 0)
+                return;
+
+            // Disable the send flag so we don't send multiple (mines were especially bad with this).
+            canSendDeathLink = false;
+
+            // If we have any amnesty left, then decrement the counter and stop here.
+            if (deathLinkAmnesty != 0)
+            {
+                deathLinkAmnesty--;
+                return;
+            }
+
+            // Grab the Take Damage Message argument.
+            TakeDamageMessage arg = (TakeDamageMessage)__args[0];
+
+            // Set up a generic reason for the DeathLink.
+            string reason = $"Abe died. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]";
+
+            // Replace the reason depending on the source of the damage.
+            switch (((TakeDamageMessage)__args[0]).Type)
+            {
+                case TakeDamageMessage.Types.Explosion: reason = $"Abe blew up. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Shot: reason = $"Abe got shot. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Fall: reason = $"Abe fell in a hole. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Bees: reason = $"Abe got stung. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Bat: reason = $"Abe got bit. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Zap: reason = $"Abe got electrocuted. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Grinder: case TakeDamageMessage.Types.UnderfloorMeatGrinder: reason = $"Abe became a Mudokon Pop. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Scrab: reason = $"A Scrab got revenge. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Slog: reason = $"Abe became Slog food. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Paramite: reason = $"A Paramite got revenge. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                default: Plugin.consoleLog.LogWarning($"Death Type {((TakeDamageMessage)__args[0]).Type} not handled for unique message!"); break;
+            }
+
+            // Send a DeathLink with our reason.
+            Plugin.DeathLink.SendDeathLink(new Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink(Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot), reason));
+            
+            // Throw the reason into the log.
+            Plugin.consoleLog.LogDebug($"Sending DeathLink with reason:\r\n\t{reason}");
+
+            // Reset the DeathLink amnesty.
+            deathLinkAmnesty = (int)(long)Plugin.slotData["death_link_amnesty"];
+        }
+    }
+}
