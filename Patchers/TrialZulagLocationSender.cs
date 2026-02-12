@@ -53,6 +53,8 @@ namespace NNT_Archipealgo.Patchers
             return true;
         }
 
+        // TODO: Doors 2 and 3 in Zulag 2 are backwards.
+        // TODO: Check Zulag 3's doors.
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ZulagLockHub), "Start")]
         static void SendZulagLocations(ref Hub ___m_hub, ref ZulagLockEffect[] ___m_lockEffects)
