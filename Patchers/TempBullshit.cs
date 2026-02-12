@@ -3,33 +3,15 @@ using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
-using BepInEx;
 using HarmonyLib;
-using Newtonsoft.Json;
-using NNT_Archipealgo.CustomData;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Reflection.Emit;
-using UnityEngine;
 using static MainMenuController;
 
 namespace NNT_Archipealgo.Patchers
 {
     internal class TempBullshit
     {
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(MainMenuController), "BeginToChapterSelect")]
-        static bool Test(MainMenuController __instance)
-        {
-            return true;
-
-            __instance.ToDebugLevelSelect();
-            return false;
-        }
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MainMenuController), "InitSaveSlotUI")]
@@ -47,7 +29,7 @@ namespace NNT_Archipealgo.Patchers
                 Plugin.slotData = connectionSuccess.SlotData;
 
                 Plugin.DeathLink = Plugin.session.CreateDeathLinkService();
-                Plugin.DeathLink.OnDeathLinkReceived += DeathLink_OnDeathLinkReceived;
+                Plugin.DeathLink.OnDeathLinkReceived += SocketEvents.Socket_ReceiveDeathLink;
 
                 if ((long)Plugin.slotData["death_link"] != 0)
                     Plugin.DeathLink.EnableDeathLink();
@@ -139,20 +121,6 @@ namespace NNT_Archipealgo.Patchers
         {
             // isn't enough to stop the button from being interacted with on controller argh
             __instance.transform.GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(false);
-        }
-
-
-        private static void DeathLink_OnDeathLinkReceived(DeathLink deathLink)
-        {
-            // Set up the message showing our DeathLink source.
-            string notifyMessage = $"DeathLink received from {deathLink.Source}";
-
-            // Present the cause and source of the DeathLink.
-            if (deathLink.Cause != null)
-                notifyMessage = $"{deathLink.Cause}";
-
-            Plugin.consoleLog.LogInfo(notifyMessage);
-            AbePatcher.hasBufferedDeathLink = true;
         }
 
         [HarmonyPrefix]

@@ -1,5 +1,7 @@
-﻿using Archipelago.MultiClient.Net.Models;
+﻿using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
+using Archipelago.MultiClient.Net.Models;
 using NNT_Archipealgo.CustomData;
+using NNT_Archipealgo.Patchers;
 
 namespace NNT_Archipealgo
 {
@@ -20,6 +22,19 @@ namespace NNT_Archipealgo
 
             // Dequeue this item.
             helper.DequeueItem();
+        }
+
+        public static void Socket_ReceiveDeathLink(DeathLink deathLink)
+        {
+            // Set up the message showing our DeathLink source.
+            string notifyMessage = $"DeathLink received from {deathLink.Source}";
+
+            // Present the cause and source of the DeathLink.
+            if (deathLink.Cause != null)
+                notifyMessage = $"{deathLink.Cause}";
+
+            Plugin.consoleLog.LogInfo(notifyMessage);
+            AbePatcher.hasBufferedDeathLink = true;
         }
 
         /// <summary>
