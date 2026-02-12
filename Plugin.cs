@@ -1,8 +1,9 @@
-﻿using BepInEx;
+﻿using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
+using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using Archipelago.MultiClient.Net;
-using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using NNT_Archipealgo.CustomData;
 using NNT_Archipealgo.Patchers;
 using System;
@@ -19,6 +20,10 @@ namespace NNT_Archipealgo
         // Logger.
         public static ManualLogSource consoleLog;
 
+        public static ConfigEntry<string> configServerAddress;
+        public static ConfigEntry<string> configSlotName;
+        public static ConfigEntry<string> configPassword;
+
         public static ArchipelagoSession session;
         public static Dictionary<string, object> slotData;
         public static DeathLinkService DeathLink;
@@ -34,6 +39,22 @@ namespace NNT_Archipealgo
         {
             // Set up the logger.
             consoleLog = Logger;
+
+            // Get the config options.
+            configServerAddress = Config.Bind("Connection",
+                                              "Server Address",
+                                              "archipelago.gg:",
+                                              "The server address that was last connected to.");
+
+            configSlotName = Config.Bind("Connection",
+                                         "Slot Name",
+                                         "New 'n' Tasty",
+                                         "The name of the last slot that was connected to.");
+
+            configPassword = Config.Bind("Connection",
+                                         "Password",
+                                         "",
+                                         "The password that was used for the last session connected to.");
 
             // Patch all the functions that need patching.
             Harmony.CreateAndPatchAll(typeof(AbePatcher));

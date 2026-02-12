@@ -37,8 +37,8 @@ namespace NNT_Archipealgo.Patchers
         {
             if (Plugin.session == null)
             {
-                Plugin.session = ArchipelagoSessionFactory.CreateSession("localhost:62746");
-                LoginResult connectionResult = Plugin.session.TryConnectAndLogin("New 'n' Tasty", "Knux", Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, null, null, null, "", true);
+                Plugin.session = ArchipelagoSessionFactory.CreateSession(Plugin.configServerAddress.Value);
+                LoginResult connectionResult = Plugin.session.TryConnectAndLogin("New 'n' Tasty", Plugin.configSlotName.Value, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, null, null, null, Plugin.configPassword.Value, true);
 
                 // Get the success data.
                 LoginSuccessful connectionSuccess = (LoginSuccessful)connectionResult;
