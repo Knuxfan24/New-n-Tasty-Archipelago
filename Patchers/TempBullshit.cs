@@ -15,7 +15,7 @@ namespace NNT_Archipealgo.Patchers
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MainMenuController), "InitSaveSlotUI")]
-        static bool KillMenu(MainMenuController __instance)
+        static bool KillMenuPlusConnect(MainMenuController __instance)
         {
             if (Plugin.session == null)
             {
@@ -24,6 +24,8 @@ namespace NNT_Archipealgo.Patchers
 
                 // Get the success data.
                 LoginSuccessful connectionSuccess = (LoginSuccessful)connectionResult;
+
+                Plugin.infoStringQueue.Add($"Connected to {Plugin.configServerAddress.Value} as {Plugin.configSlotName.Value}");
 
                 // Get the slot data.
                 Plugin.slotData = connectionSuccess.SlotData;
@@ -36,6 +38,10 @@ namespace NNT_Archipealgo.Patchers
 
                 AbePatcher.deathLinkAmnesty = (int)(long)Plugin.slotData["death_link_amnesty"];
 
+                // Add the RingLink tag if its enabled in our slot data.
+                if ((long)Plugin.slotData["ring_link"] != 0)
+                    Plugin.session.ConnectionInfo.UpdateConnectionOptions([.. Plugin.session.ConnectionInfo.Tags, .. new string[1] { "RingLink" }]);
+
                 Plugin.session.Items.ItemReceived += SocketEvents.Socket_ReceiveItem;
                 Plugin.itemQueueTimer = 1f;
                 foreach (ItemInfo item in Plugin.session.Items.AllItemsReceived)
@@ -47,6 +53,14 @@ namespace NNT_Archipealgo.Patchers
 
                 Plugin.save = new();
                 Plugin.save.RemainingLocations = Plugin.session.Locations.AllLocations.Count - Plugin.session.Locations.AllLocationsChecked.Count;
+
+                // Fetch all the locations.
+                var locations = Plugin.session.Locations.AllLocations;
+                Plugin.session.Locations.ScoutLocationsAsync(items =>
+                {
+                    Plugin.save.items = items;
+                },
+                false, [.. locations]);
 
                 // Print all the slot data to the log, as a debug log.
                 foreach (var key in Plugin.slotData)
@@ -66,7 +80,7 @@ namespace NNT_Archipealgo.Patchers
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MainMenuController), "StartFollowMe")]
-        static void Test2(object[] __args, ref FinishedFollowMeAction ___m_eFinishedFollowMeAction, ref bool ___m_selectingPlayers)
+        static void RedirectToChapterSelect(object[] __args, ref FinishedFollowMeAction ___m_eFinishedFollowMeAction, ref bool ___m_selectingPlayers)
         {
 
             if ((FinishedFollowMeAction)__args[0] == FinishedFollowMeAction.NewGame)
@@ -90,7 +104,8 @@ namespace NNT_Archipealgo.Patchers
                 case LevelList.Chapters.RescueZulag2: __result = Plugin.save.UnlockedLocations[5]; return false;
                 case LevelList.Chapters.RescueZulag3: __result = Plugin.save.UnlockedLocations[6]; return false;
                 case LevelList.Chapters.RescueZulag4: __result = Plugin.save.UnlockedLocations[7]; return false;
-                case LevelList.Chapters.TheBoardroom: __result = Plugin.save.MudokonCount >= (long)Plugin.slotData["required_muds"]; return false;
+                case LevelList.Chapters.TheBoardroom: __result = Plugin.save.MudokonCount >= (long)Plugin.slotData["required_muds"] && (long)Plugin.slotData["goal"] == 0; return false;
+                case LevelList.Chapters.Alf: __result = Plugin.save.MudokonCount >= (long)Plugin.slotData["required_muds"] && (long)Plugin.slotData["goal"] == 1; return false;
 
                 default:
                     Plugin.consoleLog.LogWarning($"Handling for {__args[0]} not implemented!"); break;
@@ -102,14 +117,11 @@ namespace NNT_Archipealgo.Patchers
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MenuElement), "RemoveFromButtonKeyChain")]
-        static bool Test3()
-        {
-            return false;
-        }
+        static bool DisableButtonRemovalFromList() => false;
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ChapterSelectPanel), "SetChapterInfo")]
-        static void Test4(ref ScrollViewButton[] ___m_acScrollViewButtons)
+        static void HandleChapterLocks(ref ScrollViewButton[] ___m_acScrollViewButtons)
         {
             foreach (var button in ___m_acScrollViewButtons)
                 button.DoToggleLocked();
@@ -117,40 +129,50 @@ namespace NNT_Archipealgo.Patchers
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ChapterSelectPanel), "Start")]
-        static void Test5(ChapterSelectPanel __instance)
+        static void RemoveChapterSelectBackButton(ChapterSelectPanel __instance)
         {
             // isn't enough to stop the button from being interacted with on controller argh
             __instance.transform.GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(false);
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(App), "PlayMovie", new Type[] { typeof(Movie.eMovies), typeof(bool), typeof(bool) })]
-        static void SendGoal(object[] __args)
-        {
-            if ((bool)__args[2]) return;
-
-            if ((Movie.eMovies)__args[0] == Movie.eMovies.BadEnding)
-                __args[0] = Movie.eMovies.GoodEnding;
-
-            if ((Movie.eMovies)__args[0] == Movie.eMovies.GoodEnding)
-            {
-                StatusUpdatePacket goalPacket = new() { Status = ArchipelagoClientState.ClientGoal };
-                Plugin.session.Socket.SendPacketAsync(goalPacket);
-            }
-        }
-
+        /// <summary>
+        /// Stops the game from even attempting to update the leaderboard data.
+        /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(LeaderBoardDataHandler), "UpdateLeaderBoardHandler")]
-        static bool NoLeaderboardPlz()
-        {
-            return false;
-        }
+        static bool DisableLeaderBoardData() => false;
 
+        // TODO: Fade seems to sometimes happen twice, might have been from QuitGameToFrontEnd having true passed to it?
+        // TODO: Locations for completing each chapter? Could also add an option to add ones for the Monsaic Lines, base Paramonia/Scrabania and the Stockyard Return?
         [HarmonyPrefix]
         [HarmonyPatch(typeof(App), "CompletedChapter")]
-        static void TestIDK()
+        static void ReturnToMenuOnChapterClear(ref LevelList.Chapters ___m_eCurrentChapter)
         {
-            Plugin.consoleLog.LogInfo("TODO: Make this return to chapter select plz.");
+            // Send the locations for the Nests and Goal Condition.
+            switch (___m_eCurrentChapter)
+            {
+                case LevelList.Chapters.ParamonianNests:
+                    Helpers.CompleteLocationCheck("Paramonian Nests");
+                    break;
+
+                case LevelList.Chapters.ScrabanianNests:
+                    Helpers.CompleteLocationCheck("Scrabanian Nests");
+                    break;
+
+                // TODO: This didn't work? Might have been because I was quitting too early or something idk.
+                case LevelList.Chapters.TheBoardroom:
+                case LevelList.Chapters.Alf:
+                    StatusUpdatePacket goalPacket = new() { Status = ArchipelagoClientState.ClientGoal };
+                    Plugin.session.Socket.SendPacketAsync(goalPacket);
+                    break;
+            }
+
+            // Return to the menu if we're not in either of the Temples or the goal areas.
+            if (___m_eCurrentChapter is not LevelList.Chapters.ParamonianTemple and not
+                                            LevelList.Chapters.ScrabanianTemple and not
+                                            LevelList.Chapters.TheBoardroom and not
+                                            LevelList.Chapters.Alf)
+                App.getInstance().QuitGameToFrontEnd(false);
         }
     }
 }

@@ -24,37 +24,9 @@ namespace NNT_Archipealgo.Patchers
             // Loop through each trial, check if its completed and send the location if so.
             for (int trialIndex = 0; trialIndex < ___m_trialEffects.Length; trialIndex++)
                 if (trials[trialIndex])
-                    Plugin.session.Locations.CompleteLocationChecks(Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", $"{temple} Trial {trialIndex + 1}"));
+                    Helpers.CompleteLocationCheck($"{temple} Trial {trialIndex + 1}");
         }
 
-        // TODO: Use this to also return to the menu? Might be worth pivoting to using the App's CompletedChapter function instead.
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ScriptedEvent), "ProcessInput")]
-        static bool SendNestLocations(ScriptedEvent __instance)
-        {
-            foreach (ScriptedInput scriptedInput in __instance.ScriptedInputs)
-            {
-                foreach (ScriptedInput.ScriptedOutput scriptedOutput in scriptedInput.ScriptedOutputs)
-                {
-                    if (scriptedOutput.OutputEvent == ScriptedEventMethod.ParaTempleComplete)
-                    {
-                        Plugin.session.Locations.CompleteLocationChecks(Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", "Paramonian Nests"));
-                        return false;
-                    }
-                    if (scriptedOutput.OutputEvent == ScriptedEventMethod.ScrabTempleComplete)
-                    {
-                        Plugin.session.Locations.CompleteLocationChecks(Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", "Scrabanian Nests"));
-                        return false;
-                    }
-
-                }
-            }
-
-            return true;
-        }
-
-        // TODO: Doors 2 and 3 in Zulag 2 are backwards.
-        // TODO: Check Zulag 3's doors.
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ZulagLockHub), "Start")]
         static void SendZulagLocations(ref Hub ___m_hub, ref ZulagLockEffect[] ___m_lockEffects)
@@ -63,17 +35,24 @@ namespace NNT_Archipealgo.Patchers
             bool[] doors = App.getInstance().m_lstZulag2Lock;
             int zulag = 2;
 
-            // If this Lock HUB is for Zulag 3, then get those doors and set the Zulag index to 3 instead.
+            // Handle Zulag 3 if that's the one we're in.
             if (___m_hub == Hub.zulag3)
             {
                 doors = App.getInstance().m_lstZulag3Lock;
                 zulag = 3;
+
+                // Loop through each door, check if its completed and send the location if so.
+                for (int doorIndex = 0; doorIndex < ___m_lockEffects.Length; doorIndex++)
+                    if (doors[doorIndex])
+                        Helpers.CompleteLocationCheck($"Zulag {zulag} Door {doorIndex + 1}");
+
+                return;
             }
 
-            // Loop through each door, check if its completed and send the location if so.
-            for (int doorIndex = 0; doorIndex < ___m_lockEffects.Length; doorIndex++)
-                if (doors[doorIndex])
-                    Plugin.session.Locations.CompleteLocationChecks(Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", $"Zulag {zulag} Door {doorIndex + 1}"));
+            // If we're in Zulag 2, then handle them differently, as the flags for Doors 2 and 3 are swapped.
+            if (doors[0]) Helpers.CompleteLocationCheck($"Zulag 2 Door 1");
+            if (doors[2]) Helpers.CompleteLocationCheck($"Zulag 2 Door 2");
+            if (doors[1]) Helpers.CompleteLocationCheck($"Zulag 2 Door 3");
         }
     }
 }

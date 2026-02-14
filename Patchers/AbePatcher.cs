@@ -73,25 +73,28 @@ namespace NNT_Archipealgo.Patchers
                 return;
             }
 
+            // Add a message for this DeathLink to our message queue.
+            Plugin.infoStringQueue.Add("Sending death to your friends!");
+
             // Grab the Take Damage Message argument.
             TakeDamageMessage arg = (TakeDamageMessage)__args[0];
 
             // Set up a generic reason for the DeathLink.
-            string reason = $"Abe died. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]";
+            string reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} died.";
 
             // Replace the reason depending on the source of the damage.
             switch (((TakeDamageMessage)__args[0]).Type)
             {
-                case TakeDamageMessage.Types.Explosion: reason = $"Abe blew up. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Shot: reason = $"Abe got shot. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Fall: reason = $"Abe fell in a hole. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Bees: reason = $"Abe got stung. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Bat: reason = $"Abe got bit. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Zap: reason = $"Abe got electrocuted. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Grinder: case TakeDamageMessage.Types.UnderfloorMeatGrinder: reason = $"Abe became a Mudokon Pop. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Scrab: reason = $"A Scrab got revenge. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Slog: reason = $"Abe became Slog food. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
-                case TakeDamageMessage.Types.Paramite: reason = $"A Paramite got revenge. [{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}]"; break;
+                case TakeDamageMessage.Types.Explosion: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} blew up."; break;
+                case TakeDamageMessage.Types.Shot: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got shot."; break;
+                case TakeDamageMessage.Types.Fall: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} fell in a hole."; break;
+                case TakeDamageMessage.Types.Bees: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got stung."; break;
+                case TakeDamageMessage.Types.Bat: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got bit."; break;
+                case TakeDamageMessage.Types.Zap: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got electrocuted."; break;
+                case TakeDamageMessage.Types.Grinder: case TakeDamageMessage.Types.UnderfloorMeatGrinder: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} became a Mudokon Pop."; break;
+                case TakeDamageMessage.Types.Scrab: reason = $"A Scrab got revenge on {Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}."; break;
+                case TakeDamageMessage.Types.Slog: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} became Slog food."; break;
+                case TakeDamageMessage.Types.Paramite: reason = $"A Paramite got revenge on {Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}."; break;
                 default: Plugin.consoleLog.LogWarning($"Death Type {((TakeDamageMessage)__args[0]).Type} not handled for unique message!"); break;
             }
 

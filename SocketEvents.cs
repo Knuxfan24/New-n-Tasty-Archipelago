@@ -33,7 +33,7 @@ namespace NNT_Archipealgo
             if (deathLink.Cause != null)
                 notifyMessage = $"{deathLink.Cause}";
 
-            Plugin.consoleLog.LogInfo(notifyMessage);
+            Plugin.infoStringQueue.Add(notifyMessage);
             AbePatcher.hasBufferedDeathLink = true;
         }
 

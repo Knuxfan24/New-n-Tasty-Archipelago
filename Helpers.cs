@@ -33,5 +33,25 @@ namespace NNT_Archipealgo
                 default: Plugin.consoleLog.LogError($"Item Type '{item.Key.ItemName}' (sent by '{item.Key.Source}' {item.Value} time(s)) not yet handled!"); return;
             }
         }
+
+        /// <summary>
+        /// Checks if a location exists in the multiworld.
+        /// </summary>
+        public static bool CheckLocationExists(long locationIndex) => locationIndex != -1 && Plugin.session.Locations.AllLocations.Contains(locationIndex);
+
+        public static void CompleteLocationCheck(string locationName)
+        {
+            long locationIndex = Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", locationName);
+
+            if (CheckLocationExists(locationIndex) && !Plugin.session.Locations.AllLocationsChecked.Contains(locationIndex))
+            {
+                Plugin.EnqueueLocation(locationIndex);
+
+                var item = Plugin.save.items[locationIndex];
+
+                if (item.Player.Name != Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot))
+                    Plugin.infoStringQueue.Add($"Found {item.Player.Name}'s {item.ItemName}.");
+            }
+        }
     }
 }

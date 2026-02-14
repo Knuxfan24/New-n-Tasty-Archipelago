@@ -1,4 +1,7 @@
-﻿namespace NNT_Archipealgo.CustomData
+﻿using Archipelago.MultiClient.Net.Models;
+using System.Collections.Generic;
+
+namespace NNT_Archipealgo.CustomData
 {
     public class ArchipelagoSave
     {
@@ -16,5 +19,7 @@
         public int MudokonCount { get; set; }
 
         public bool[] UnlockedLocations { get; set; } = new bool[8];
+
+        public Dictionary<long, ScoutedItemInfo> items;
     }
 }

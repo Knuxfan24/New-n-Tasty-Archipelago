@@ -46,6 +46,7 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(LiftController), "StartMoving")]
         static bool StopLifts() => Plugin.save.CanUseLifts;
 
+        // TODO: The first time a Mudokon Native interacts with Abe ignores this and still gives a Spirit Ring?
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonNative), "TransferSpiritRingsEnter")]
         static bool StopSpiritRingsEnter() => Plugin.save.CanUseSpiritRings;

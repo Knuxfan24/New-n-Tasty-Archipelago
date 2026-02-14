@@ -28,8 +28,12 @@ namespace NNT_Archipealgo.Patchers
                         // Check that this Mudokon's bounding box is overlapping the portal's position.
                         if (__instance.m_cOOBB.Contains(component.transform.position))
                         {
-                            // Send the location for this Mudokon by looking up its ID in our table.
-                            Plugin.session.Locations.CompleteLocationChecks(Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", MudokonTable.MudokonIDs[component.ID]));
+                            // Send the location for this Mudokon.
+                            Helpers.CompleteLocationCheck(MudokonTable.MudokonIDs[component.ID]);
+
+                            // Send a RingLink if we have our joke RingLink option on.
+                            if ((long)Plugin.slotData["ring_link"] != 0)
+                                Plugin.RingLinkMudokonCount++;
                         }
                     }
                 }
