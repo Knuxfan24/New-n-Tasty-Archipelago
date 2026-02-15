@@ -18,7 +18,7 @@ namespace NNT_Archipealgo.CustomData
         public int RemainingLocations { get; set; }
         public int MudokonCount { get; set; }
 
-        public bool[] UnlockedLocations { get; set; } = new bool[8];
+        public bool[] UnlockedLocations { get; set; } = new bool[9];
 
         public Dictionary<long, ScoutedItemInfo> items;
     }

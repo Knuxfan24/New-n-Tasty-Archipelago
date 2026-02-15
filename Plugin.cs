@@ -1,4 +1,5 @@
-﻿using Archipelago.MultiClient.Net;
+﻿// TODO: Clean this up, the thread stuff is basically just copied 1 to 1 from Freedom Planet 2.
+using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Packets;
 using BepInEx;
@@ -76,6 +77,7 @@ namespace NNT_Archipealgo
 
             // Patch all the functions that need patching.
             Harmony.CreateAndPatchAll(typeof(AbePatcher));
+            Harmony.CreateAndPatchAll(typeof(AppPatcher));
             Harmony.CreateAndPatchAll(typeof(DisableAbilities));
             Harmony.CreateAndPatchAll(typeof(MudokonSlavePatcher));
             Harmony.CreateAndPatchAll(typeof(PortalPatcher));

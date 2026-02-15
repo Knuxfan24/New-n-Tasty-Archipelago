@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using static ScriptedEvent;
 using static ZulagLockHub;
 
 namespace NNT_Archipealgo.Patchers
@@ -31,21 +30,21 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(ZulagLockHub), "Start")]
         static void SendZulagLocations(ref Hub ___m_hub, ref ZulagLockEffect[] ___m_lockEffects)
         {
-            // Get the Zulag 2 doors and set our Zulag index to 2.
+            // Get the Zulag 2 doors.
             bool[] doors = App.getInstance().m_lstZulag2Lock;
-            int zulag = 2;
 
             // Handle Zulag 3 if that's the one we're in.
             if (___m_hub == Hub.zulag3)
             {
+                // Get the Zulag 3 doors instead.
                 doors = App.getInstance().m_lstZulag3Lock;
-                zulag = 3;
 
                 // Loop through each door, check if its completed and send the location if so.
                 for (int doorIndex = 0; doorIndex < ___m_lockEffects.Length; doorIndex++)
                     if (doors[doorIndex])
-                        Helpers.CompleteLocationCheck($"Zulag {zulag} Door {doorIndex + 1}");
+                        Helpers.CompleteLocationCheck($"Zulag 3 Door {doorIndex + 1}");
 
+                // Don't run the Zulag 2 checks.
                 return;
             }
 

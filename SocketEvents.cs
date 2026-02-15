@@ -24,6 +24,9 @@ namespace NNT_Archipealgo
             helper.DequeueItem();
         }
 
+        /// <summary>
+        /// Event handler for when we receive a DeathLink from the multiworld.
+        /// </summary>
         public static void Socket_ReceiveDeathLink(DeathLink deathLink)
         {
             // Set up the message showing our DeathLink source.
@@ -33,7 +36,10 @@ namespace NNT_Archipealgo
             if (deathLink.Cause != null)
                 notifyMessage = $"{deathLink.Cause}";
 
+            // Add our message to the info string queue.
             Plugin.infoStringQueue.Add(notifyMessage);
+
+            // Set the flag that a DeathLink is waiting.
             AbePatcher.hasBufferedDeathLink = true;
         }
 

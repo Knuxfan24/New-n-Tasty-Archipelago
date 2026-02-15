@@ -91,31 +91,6 @@ namespace NNT_Archipealgo.Patchers
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(App), "GetChapterStarted")]
-        static bool HijackLocks(object[] __args, ref bool __result)
-        {
-            switch ((LevelList.Chapters)__args[0])
-            {
-                case LevelList.Chapters.RuptureFarms: __result = Plugin.save.UnlockedLocations[0]; return false;
-                case LevelList.Chapters.StockyardEscape: __result = Plugin.save.UnlockedLocations[1]; return false;
-                case LevelList.Chapters.ParamonianTemple: __result = Plugin.save.UnlockedLocations[2]; return false;
-                case LevelList.Chapters.ScrabanianTemple: __result = Plugin.save.UnlockedLocations[3]; return false;
-                case LevelList.Chapters.RescueZulag1: __result = Plugin.save.UnlockedLocations[4]; return false;
-                case LevelList.Chapters.RescueZulag2: __result = Plugin.save.UnlockedLocations[5]; return false;
-                case LevelList.Chapters.RescueZulag3: __result = Plugin.save.UnlockedLocations[6]; return false;
-                case LevelList.Chapters.RescueZulag4: __result = Plugin.save.UnlockedLocations[7]; return false;
-                case LevelList.Chapters.TheBoardroom: __result = Plugin.save.MudokonCount >= (long)Plugin.slotData["required_muds"] && (long)Plugin.slotData["goal"] == 0; return false;
-                case LevelList.Chapters.Alf: __result = Plugin.save.MudokonCount >= (long)Plugin.slotData["required_muds"] && (long)Plugin.slotData["goal"] == 1; return false;
-
-                default:
-                    Plugin.consoleLog.LogWarning($"Handling for {__args[0]} not implemented!"); break;
-            }
-
-            __result = false;
-            return false;
-        }
-
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(MenuElement), "RemoveFromButtonKeyChain")]
         static bool DisableButtonRemovalFromList() => false;
 
@@ -141,38 +116,5 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPrefix]
         [HarmonyPatch(typeof(LeaderBoardDataHandler), "UpdateLeaderBoardHandler")]
         static bool DisableLeaderBoardData() => false;
-
-        // TODO: Fade seems to sometimes happen twice, might have been from QuitGameToFrontEnd having true passed to it?
-        // TODO: Locations for completing each chapter? Could also add an option to add ones for the Monsaic Lines, base Paramonia/Scrabania and the Stockyard Return?
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(App), "CompletedChapter")]
-        static void ReturnToMenuOnChapterClear(ref LevelList.Chapters ___m_eCurrentChapter)
-        {
-            // Send the locations for the Nests and Goal Condition.
-            switch (___m_eCurrentChapter)
-            {
-                case LevelList.Chapters.ParamonianNests:
-                    Helpers.CompleteLocationCheck("Paramonian Nests");
-                    break;
-
-                case LevelList.Chapters.ScrabanianNests:
-                    Helpers.CompleteLocationCheck("Scrabanian Nests");
-                    break;
-
-                // TODO: This didn't work? Might have been because I was quitting too early or something idk.
-                case LevelList.Chapters.TheBoardroom:
-                case LevelList.Chapters.Alf:
-                    StatusUpdatePacket goalPacket = new() { Status = ArchipelagoClientState.ClientGoal };
-                    Plugin.session.Socket.SendPacketAsync(goalPacket);
-                    break;
-            }
-
-            // Return to the menu if we're not in either of the Temples or the goal areas.
-            if (___m_eCurrentChapter is not LevelList.Chapters.ParamonianTemple and not
-                                            LevelList.Chapters.ScrabanianTemple and not
-                                            LevelList.Chapters.TheBoardroom and not
-                                            LevelList.Chapters.Alf)
-                App.getInstance().QuitGameToFrontEnd(false);
-        }
     }
 }
