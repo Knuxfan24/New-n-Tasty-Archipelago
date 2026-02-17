@@ -33,8 +33,9 @@ namespace NNT_Archipealgo
                 case "Zulag 4": Plugin.save.UnlockedLocations[7] = true; break;
                 case "Monsaic Lines": Plugin.save.UnlockedLocations[8] = true; break;
 
-                case "Shock Trap": AbePatcher.player?.ReInitStateMachine(SMStates.AbeZap); break;
-                case "Trip Trap": AbePatcher.player?.SetState(SMStates.AbeHitWall); break;
+                case "Shock Trap": AbePatcher.SetTrapState(SMStates.AbeZap); break;
+                case "Trip Trap": case "lol brawl reference": AbePatcher.SetTrapState(SMStates.AbeLandDamage); break;
+                case "QuikSave Trap": App.getInstance().SaveQuickSave(); break; // Haven't implemented this into the apworld as I'm still not sure if I want it.
 
                 // Unhandled items, throw an error into the console.
                 default: Plugin.consoleLog.LogError($"Item Type '{item.Key.ItemName}' (sent by '{item.Key.Source}' {item.Value} time(s)) not yet handled!"); return;

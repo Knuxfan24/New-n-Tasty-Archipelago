@@ -122,7 +122,29 @@ namespace NNT_Archipealgo.Patchers
             deathLinkAmnesty = (int)(long)Plugin.slotData["death_link_amnesty"];
         }
 
+        /// <summary>
+        /// Forces Abe's state into the provided one.
+        /// Wrapped in a try catch block as poorly timed traps could completely break item receiving due to a null reference exception in the animator, so this gets around that.
+        /// </summary>
+        public static void SetTrapState(SMStates state)
+        {
+            // TODO: Receiving a state based trap can cause some weirdness (like regaining control of Abe during a possession).
+            try
+            {
+                player?.ReInitStateMachine(state);
+            }
+            catch
+            {
+
+            }
+        }
+
         //[HarmonyPostfix]
         //[HarmonyPatch(typeof(Abe), "Update")]
+        //private static void StateTester(Abe __instance)
+        //{
+        //    if (Input.GetKeyDown(KeyCode.F9))
+        //        __instance.SetState(SMStates.AbeGamespeakFart);
+        //}
     }
 }
