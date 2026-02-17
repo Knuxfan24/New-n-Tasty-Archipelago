@@ -36,6 +36,7 @@ namespace NNT_Archipealgo
                 case "Shock Trap": AbePatcher.SetTrapState(SMStates.AbeZap); break;
                 case "Trip Trap": case "lol brawl reference": AbePatcher.SetTrapState(SMStates.AbeLandDamage); break;
                 case "QuikSave Trap": App.getInstance().SaveQuickSave(); break; // Haven't implemented this into the apworld as I'm still not sure if I want it.
+                case "Drop Trap": AbePatcher.DropTrap(); break;
 
                 // Unhandled items, throw an error into the console.
                 default: Plugin.consoleLog.LogError($"Item Type '{item.Key.ItemName}' (sent by '{item.Key.Source}' {item.Value} time(s)) not yet handled!"); return;

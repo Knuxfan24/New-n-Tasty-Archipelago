@@ -1,11 +1,13 @@
 ﻿using HarmonyLib;
-using UnityEngine;
+using System.Reflection;
 using static JAWStateMachine;
 
 namespace NNT_Archipealgo.Patchers
 {
     internal class AbePatcher
     {
+        private static readonly MethodInfo dropItem = typeof(Abe).GetMethod("DropPickUp", BindingFlags.NonPublic | BindingFlags.Instance);
+
         /// <summary>
         /// Holds a reference to the player's object.
         /// </summary>
@@ -139,12 +141,17 @@ namespace NNT_Archipealgo.Patchers
             }
         }
 
+        /// <summary>
+        /// Forces Abe to drop whatever he's carrying (usually a bottlecap).
+        /// </summary>
+        public static void DropTrap() => dropItem.Invoke(player, new object[] { });
+
         //[HarmonyPostfix]
         //[HarmonyPatch(typeof(Abe), "Update")]
         //private static void StateTester(Abe __instance)
         //{
         //    if (Input.GetKeyDown(KeyCode.F9))
-        //        __instance.SetState(SMStates.AbeGamespeakFart);
+        //        dropItem.Invoke(player, new object[] { });
         //}
     }
 }
