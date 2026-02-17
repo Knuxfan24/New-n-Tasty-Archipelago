@@ -79,12 +79,11 @@ namespace NNT_Archipealgo
             Harmony.CreateAndPatchAll(typeof(AbePatcher));
             Harmony.CreateAndPatchAll(typeof(AppPatcher));
             Harmony.CreateAndPatchAll(typeof(DisableAbilities));
+            Harmony.CreateAndPatchAll(typeof(MainMenuPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonSlavePatcher));
             Harmony.CreateAndPatchAll(typeof(PortalPatcher));
             Harmony.CreateAndPatchAll(typeof(StatusBoardPatcher));
             Harmony.CreateAndPatchAll(typeof(TrialZulagLocationSender));
-
-            Harmony.CreateAndPatchAll(typeof(TempBullshit));
         }
 
         private void Start()
