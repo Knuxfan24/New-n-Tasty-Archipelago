@@ -2,7 +2,7 @@
 
 namespace NNT_Archipealgo
 {
-    internal class MudokonTable
+    internal class LookUpTables
     {
         public static Dictionary<int, string> MudokonIDs = new()
         {

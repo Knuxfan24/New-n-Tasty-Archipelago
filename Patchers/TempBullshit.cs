@@ -1,10 +1,7 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
-using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
-using Archipelago.MultiClient.Net.Packets;
 using HarmonyLib;
-using System;
 using System.IO;
 using static MainMenuController;
 
@@ -12,7 +9,6 @@ namespace NNT_Archipealgo.Patchers
 {
     internal class TempBullshit
     {
-
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MainMenuController), "InitSaveSlotUI")]
         static bool KillMenuPlusConnect(MainMenuController __instance)

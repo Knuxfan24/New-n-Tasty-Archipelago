@@ -1,6 +1,8 @@
 ﻿using Archipelago.MultiClient.Net.Models;
 using NNT_Archipealgo.CustomData;
+using NNT_Archipealgo.Patchers;
 using System.Collections.Generic;
+using static JAWStateMachine;
 
 namespace NNT_Archipealgo
 {
@@ -30,6 +32,9 @@ namespace NNT_Archipealgo
                 case "Zulag 3": Plugin.save.UnlockedLocations[6] = true; break;
                 case "Zulag 4": Plugin.save.UnlockedLocations[7] = true; break;
                 case "Monsaic Lines": Plugin.save.UnlockedLocations[8] = true; break;
+
+                case "Shock Trap": AbePatcher.player?.ReInitStateMachine(SMStates.AbeZap); break;
+                case "Trip Trap": AbePatcher.player?.SetState(SMStates.AbeHitWall); break;
 
                 // Unhandled items, throw an error into the console.
                 default: Plugin.consoleLog.LogError($"Item Type '{item.Key.ItemName}' (sent by '{item.Key.Source}' {item.Value} time(s)) not yet handled!"); return;

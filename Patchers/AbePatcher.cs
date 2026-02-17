@@ -1,9 +1,16 @@
 ﻿using HarmonyLib;
+using UnityEngine;
+using static JAWStateMachine;
 
 namespace NNT_Archipealgo.Patchers
 {
     internal class AbePatcher
     {
+        /// <summary>
+        /// Holds a reference to the player's object.
+        /// </summary>
+        public static Abe player;
+
         /// <summary>
         /// Whether or not we have a DeathLink queued.
         /// </summary>
@@ -18,6 +25,13 @@ namespace NNT_Archipealgo.Patchers
         /// How much amnesty we have before we send out a DeathLink.
         /// </summary>
         public static int deathLinkAmnesty = 10;
+
+        /// <summary>
+        /// Grabs a reference to the player's object.
+        /// </summary>
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Abe), "Start")]
+        private static void Setup(Abe __instance) => player = __instance;
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Abe), "RespawnStartEnter")]
@@ -107,5 +121,8 @@ namespace NNT_Archipealgo.Patchers
             // Reset the DeathLink amnesty.
             deathLinkAmnesty = (int)(long)Plugin.slotData["death_link_amnesty"];
         }
+
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(Abe), "Update")]
     }
 }
