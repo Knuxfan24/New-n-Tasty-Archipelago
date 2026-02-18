@@ -38,11 +38,13 @@
         [HarmonyPatch(typeof(Lever), "LeverPulled")]
         static bool DisableLevers() => Plugin.save.HasLevers;
 
-        // TODO: Doesn't stop the cargo lift in Zulag 1.
         [HarmonyPrefix]
         [HarmonyPatch(typeof(LiftController), "StartMoving")]
         static bool StopLifts() => Plugin.save.CanUseLifts;
-        
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Abe), "Update")]
+        static void StopCargoLift(ref CargoElevator ___m_cCargoElevator) => ___m_cCargoElevator?.m_bUsable = Plugin.save.CanUseLifts;
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonNative), "IdleExecute")]
         static bool StopSpiritRings() => Plugin.save.CanUseSpiritRings;
