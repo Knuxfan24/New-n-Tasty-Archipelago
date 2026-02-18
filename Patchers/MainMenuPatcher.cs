@@ -17,6 +17,12 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(MainMenuController), "InitSaveSlotUI")]
         static bool KillMenuPlusConnect(MainMenuController __instance)
         {
+            // Deactivate the main menu's back button (also gets rid of the social media buttons that are there on the Steam version).
+            __instance.m_frontEnd.transform.GetChild(1).transform.GetChild(6).gameObject.SetActive(false);
+
+            // Deactivate the chapter select's back button.
+            __instance.m_levelSelect.transform.GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(false);
+
             // Check that we're not already connected to the server.
             if (Plugin.session == null)
             {
@@ -151,21 +157,32 @@ namespace NNT_Archipealgo.Patchers
         }
 
         /// <summary>
-        /// Removes the Back button from the Chapter Select.
-        /// TODO: The button still reacts to controller input.
-        /// </summary>
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ChapterSelectPanel), "Start")]
-        static void RemoveChapterSelectBackButton(ChapterSelectPanel __instance)
-        {
-            __instance.transform.GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(false);
-        }
-
-        /// <summary>
         /// Stops the game from even attempting to update the leaderboard data.
         /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(LeaderBoardDataHandler), "UpdateLeaderBoardHandler")]
         static bool DisableLeaderBoardData() => false;
+
+        /// <summary>
+        /// Disables the back button on the main menu.
+        /// </summary>
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MainMenuController), "BackToSaveSlotSelect")]
+        static bool DisableReturnToSaveSelect(ref bool ___m_bDoBackOutcome)
+        {
+            ___m_bDoBackOutcome = false;
+            return false;
+        }
+
+        /// <summary>
+        /// Disables the back button on the chapter select.
+        /// </summary>
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MainMenuController), "BackToBegin")]
+        static bool DisableReturnToMenu(ref bool ___m_bDoBackOutcome)
+        {
+            ___m_bDoBackOutcome = false;
+            return false;
+        }
     }
 }
