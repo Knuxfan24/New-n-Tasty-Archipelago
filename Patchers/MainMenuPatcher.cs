@@ -97,8 +97,14 @@ namespace NNT_Archipealgo.Patchers
             }
 
             // Delete save slot 24 if it exists.
+            // The GOG version doesn't even have the Steam Manager, so we specifically need to compile it out.
+            #if !GOG
             if (File.Exists($"SaveGame/{SteamManager.GetInstance.GetAccountID()}/SaveSlot24.NnT"))
-                File.Delete($"SaveGame/{SteamManager.GetInstance.GetAccountID()}/SaveSlot24.NnT");
+                    File.Delete($"SaveGame/{SteamManager.GetInstance.GetAccountID()}/SaveSlot24.NnT");
+            #else
+            if (File.Exists($"SaveGame/SaveSlot24.NnT"))
+                File.Delete($"SaveGame/SaveSlot24.NnT");
+            #endif
 
             // Load the now nonexistant save slot 24.
             App.getInstance().LoadSaveFile(24);
