@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using static ZulagLockHub;
+﻿using static ZulagLockHub;
 
 namespace NNT_Archipealgo.Patchers
 {

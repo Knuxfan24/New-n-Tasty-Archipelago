@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using System.Reflection;
+﻿using System.Reflection;
 using static JAWStateMachine;
 
 namespace NNT_Archipealgo.Patchers
@@ -74,6 +73,9 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(Abe), "Kill")]
         static void SendDeathLink(ref TakeDamageMessage cTakeDamageMessage)
         {
+            // Temporarily display the death damage type so we can figure out what maps to what and make messages for them.
+            Plugin.consoleLog.LogDebug(cTakeDamageMessage.Type);
+
             // Only do any of this if we can send a DeathLink and have it enabled.
             if (!canSendDeathLink || (long)Plugin.slotData["death_link"] == 0)
                 return;

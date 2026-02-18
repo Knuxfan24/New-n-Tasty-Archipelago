@@ -1,6 +1,5 @@
 ﻿using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
-using HarmonyLib;
 
 namespace NNT_Archipealgo.Patchers
 {
@@ -69,15 +68,12 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(App), "CompletedChapter")]
         static void HandleChapterClear(ref LevelList.Chapters ___m_eCurrentChapter)
         {
-            // TODO: Remove this once I don't need it anymore.
-            Plugin.consoleLog.LogDebug($"CompletedChapter fired with chapter set to {___m_eCurrentChapter}");
-
             // Send the clear location for the current chapter (or the goal position for The Boardroom or Alf's Escape).
             switch (___m_eCurrentChapter)
             {
                 case LevelList.Chapters.RuptureFarms: Helpers.CompleteLocationCheck("Rupture Farms - Clear"); break;
                 case LevelList.Chapters.StockyardEscape: Helpers.CompleteLocationCheck("Stockyard Escape - Clear"); break;
-                case LevelList.Chapters.MonsaicLines: Helpers.CompleteLocationCheck("Monsaic Lines - Clear"); break;
+                case LevelList.Chapters.MonsaicLines: Helpers.CompleteLocationCheck("Monsaic Lines - Clear"); break; // TODO: Test this one, slightly worried about it.
                 case LevelList.Chapters.Paramonia: Helpers.CompleteLocationCheck("Paramonia - Clear"); break;
                 case LevelList.Chapters.ParamonianNests: Helpers.CompleteLocationCheck("Paramonian Nests - Clear"); break;
                 case LevelList.Chapters.Scrabania: Helpers.CompleteLocationCheck("Scrabania - Clear"); break;

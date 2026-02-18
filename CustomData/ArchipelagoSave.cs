@@ -1,5 +1,4 @@
 ﻿using Archipelago.MultiClient.Net.Models;
-using System.Collections.Generic;
 
 namespace NNT_Archipealgo.CustomData
 {

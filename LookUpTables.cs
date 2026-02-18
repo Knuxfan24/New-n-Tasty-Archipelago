@@ -4,6 +4,8 @@ namespace NNT_Archipealgo
 {
     internal class LookUpTables
     {
+        // TODO: Thought up a way to make this redudant, as the location IDs should match the Mudokon IDs.
+        // Make that change and test to see if it works, if so, yeet this.
         public static Dictionary<int, string> MudokonIDs = new()
         {
             {1, "Rupture Farms Escape ~ Secret Area 1 - Mudokon 1"},

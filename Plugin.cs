@@ -1,19 +1,20 @@
 ﻿// TODO: Clean this up, the thread stuff is basically just copied 1 to 1 from Freedom Planet 2.
+global using HarmonyLib;
+global using System.Collections.Generic;
+global using UnityEngine;
+
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Packets;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using HarmonyLib;
 using NNT_Archipealgo.CustomData;
 using NNT_Archipealgo.Patchers;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using UnityEngine;
 
 namespace NNT_Archipealgo
 {
@@ -63,17 +64,17 @@ namespace NNT_Archipealgo
             configServerAddress = Config.Bind("Connection",
                                               "Server Address",
                                               "archipelago.gg:",
-                                              "The server address that was last connected to.");
+                                              "The server address to connect to.");
 
             configSlotName = Config.Bind("Connection",
                                          "Slot Name",
                                          "New 'n' Tasty",
-                                         "The name of the last slot that was connected to.");
+                                         "The slot to connect to.");
 
             configPassword = Config.Bind("Connection",
                                          "Password",
                                          "",
-                                         "The password that was used for the last session connected to.");
+                                         "The password for the server we're connecting to (leave blank if no password is required).");
 
             // Patch all the functions that need patching.
             Harmony.CreateAndPatchAll(typeof(AbePatcher));
@@ -106,6 +107,7 @@ namespace NNT_Archipealgo
 
         private void OnGUI()
         {
+            // Create the text style.
             GUIStyle textStyle = new()
             {
                 fontSize = 32,
@@ -113,24 +115,37 @@ namespace NNT_Archipealgo
                 alignment = TextAnchor.LowerCenter
             };
 
+            // Set the style's colour to black and write the info string with a 2 pixel offset to create a drop shadow.
             textStyle.normal.textColor = Color.black;
             GUI.Label(new Rect(2, 2, Screen.width, Screen.height), infoString, textStyle);
+
+            // Set the style's colour back to white and write the info string without an offset.
             textStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(0, 0, Screen.width, Screen.height), infoString, textStyle);
         }
 
         private void Update()
         {
+            // Decrement the timer by the game's delta time.
             infoTimer -= Time.deltaTime;
 
+            // Check if the timer has reached or gone below 0.
             if (infoTimer <= 0)
             {
+                // Check that we have any messages queued.
                 if (infoStringQueue.Count > 0)
                 {
+                    // Get the first queued message and set info string to it.
                     infoString = infoStringQueue[0];
+
+                    // Remove the first message from the queue.
                     infoStringQueue.RemoveAt(0);
+
+                    // Set the timer back to 3 seconds.
                     infoTimer = 3f;
                 }
+
+                // If we don't have any messages queued then blank out the string and keep the tiemr at 0.
                 else
                 {
                     infoString = string.Empty;

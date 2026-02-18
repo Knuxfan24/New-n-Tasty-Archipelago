@@ -1,6 +1,4 @@
-﻿using HarmonyLib;
-
-namespace NNT_Archipealgo.Patchers
+﻿namespace NNT_Archipealgo.Patchers
 {
     internal class MudokonSlavePatcher
     {

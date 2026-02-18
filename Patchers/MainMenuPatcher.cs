@@ -2,7 +2,6 @@
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
-using HarmonyLib;
 using System.Collections.ObjectModel;
 using System.IO;
 using static MainMenuController;

@@ -1,7 +1,6 @@
 ﻿using Archipelago.MultiClient.Net.Models;
 using NNT_Archipealgo.CustomData;
 using NNT_Archipealgo.Patchers;
-using System.Collections.Generic;
 using static JAWStateMachine;
 
 namespace NNT_Archipealgo
