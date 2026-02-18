@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace NNT_Archipealgo
+﻿namespace NNT_Archipealgo
 {
     internal class LookUpTables
     {
