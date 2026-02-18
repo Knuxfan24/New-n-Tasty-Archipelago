@@ -25,7 +25,7 @@
                         if (__instance.m_cOOBB.Contains(component.transform.position))
                         {
                             // Send the location for this Mudokon.
-                            Helpers.CompleteLocationCheck(LookUpTables.MudokonIDs[component.ID]);
+                            Helpers.CompleteLocationCheck(component.ID);
 
                             // Send a RingLink if we have our joke RingLink option on.
                             if ((long)Plugin.slotData["ring_link"] != 0)

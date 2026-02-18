@@ -48,13 +48,15 @@ namespace NNT_Archipealgo
         public static bool CheckLocationExists(long locationIndex) => locationIndex != -1 && Plugin.session.Locations.AllLocations.Contains(locationIndex);
 
         /// <summary>
+        /// Gets a location index by its name then passes it to the other CompleteLocationCheck function to do the actual check.
+        /// </summary>
+        public static void CompleteLocationCheck(string locationName) => CompleteLocationCheck(Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", locationName));
+
+        /// <summary>
         /// Completes a location check.
         /// </summary>
-        public static void CompleteLocationCheck(string locationName)
+        public static void CompleteLocationCheck(long locationIndex)
         {
-            // Get the ID of this location.
-            long locationIndex = Plugin.session.Locations.GetLocationIdFromName("New 'n' Tasty", locationName);
-
             // Check if this location exists and hasn't already been checked.
             if (CheckLocationExists(locationIndex) && !Plugin.session.Locations.AllLocationsChecked.Contains(locationIndex))
             {
