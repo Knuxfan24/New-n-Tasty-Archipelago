@@ -1,4 +1,6 @@
-﻿namespace NNT_Archipealgo.CustomData
+﻿using System;
+
+namespace NNT_Archipealgo.CustomData
 {
     public class LocationData
     {
