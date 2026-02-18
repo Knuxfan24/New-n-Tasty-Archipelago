@@ -42,24 +42,10 @@
         [HarmonyPrefix]
         [HarmonyPatch(typeof(LiftController), "StartMoving")]
         static bool StopLifts() => Plugin.save.CanUseLifts;
-
-        // TODO: The first time a Mudokon Native interacts with Abe ignores this and still gives a Spirit Ring?
+        
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(MudokonNative), "TransferSpiritRingsEnter")]
-        static bool StopSpiritRingsEnter() => Plugin.save.CanUseSpiritRings;
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(MudokonNative), "TransferSpiritRingsExit")]
-        static bool StopSpiritRingsExit(MudokonNative __instance, ref bool ___m_bChantAudioPlaying)
-        {
-            // If we can't use Spirit Rings, then at least stop the Mudokon's chant sound.
-            if (!Plugin.save.CanUseSpiritRings)
-            {
-                ___m_bChantAudioPlaying = false;
-                AkSoundEngine.PostEvent("Stop_vox_mudnative_chant", __instance.gameObject);
-                return false;
-            }
-            return true;
-        }
+        [HarmonyPatch(typeof(MudokonNative), "IdleExecute")]
+        static bool StopSpiritRings() => Plugin.save.CanUseSpiritRings;
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ToggleMine), "ActivatedChangeColour")]
