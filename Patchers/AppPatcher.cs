@@ -11,7 +11,7 @@ namespace NNT_Archipealgo.Patchers
         /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(App), "GetChapterStarted")]
-        static bool HijackChapterUnlocks(object[] __args, ref bool __result)
+        static bool HijackChapterUnlocks(ref LevelList.Chapters eChapter, ref bool __result)
         {
             // Check if the Paramonian Trials have been done.
             bool paramoniaTrialsDone = false;
@@ -38,7 +38,7 @@ namespace NNT_Archipealgo.Patchers
                 scrabaniaTrialsDone = true;
 
             // Handle replacing the result depending on our chapter.
-            switch ((LevelList.Chapters)__args[0])
+            switch (eChapter)
             {
                 case LevelList.Chapters.RuptureFarms: __result = Plugin.save.UnlockedLocations[0]; return false;
                 case LevelList.Chapters.StockyardEscape: __result = Plugin.save.UnlockedLocations[1]; return false;
@@ -58,7 +58,7 @@ namespace NNT_Archipealgo.Patchers
                 case LevelList.Chapters.Alf: __result = Plugin.save.MudokonCount >= (long)Plugin.slotData["required_muds"] && (long)Plugin.slotData["goal"] == 1; return false;
 
                 default:
-                    Plugin.consoleLog.LogWarning($"Handling for {__args[0]} not implemented!"); __result = false; return false;
+                    Plugin.consoleLog.LogWarning($"Handling for {eChapter} not implemented!"); __result = false; return false;
             }
         }
 

@@ -113,15 +113,14 @@ namespace NNT_Archipealgo.Patchers
 
         /// <summary>
         /// Forces the game to go to the chapter select rather than starting a new game.
-        /// TODO: Replace the args reference with a reference to the specific parameter.
         /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MainMenuController), "StartFollowMe")]
-        static void RedirectToChapterSelect(object[] __args, ref FinishedFollowMeAction ___m_eFinishedFollowMeAction, ref bool ___m_selectingPlayers)
+        static void RedirectToChapterSelect(ref FinishedFollowMeAction eNextAction, ref FinishedFollowMeAction ___m_eFinishedFollowMeAction, ref bool ___m_selectingPlayers)
         {
             // Check if we're trying to start a new game.
             // If so, redirect it to the chapter select and remove the flag telling the menu that we're on the player count select menu.
-            if ((FinishedFollowMeAction)__args[0] == FinishedFollowMeAction.NewGame)
+            if (eNextAction == FinishedFollowMeAction.NewGame)
             {
                 ___m_eFinishedFollowMeAction = FinishedFollowMeAction.ToChapterSelect;
                 ___m_selectingPlayers = false;
