@@ -68,7 +68,7 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(App), "CompletedChapter")]
         static void HandleChapterClear(ref LevelList.Chapters ___m_eCurrentChapter)
         {
-            // Send the clear location for the current chapter (or the goal position for The Boardroom or Alf's Escape).
+            // Send the clear location for the current chapter (or the goal packet for The Boardroom or Alf's Escape).
             switch (___m_eCurrentChapter)
             {
                 case LevelList.Chapters.RuptureFarms: Helpers.CompleteLocationCheck("Rupture Farms - Clear"); break;
