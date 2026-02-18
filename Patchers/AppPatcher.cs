@@ -73,7 +73,7 @@ namespace NNT_Archipealgo.Patchers
             {
                 case LevelList.Chapters.RuptureFarms: Helpers.CompleteLocationCheck("Rupture Farms - Clear"); break;
                 case LevelList.Chapters.StockyardEscape: Helpers.CompleteLocationCheck("Stockyard Escape - Clear"); break;
-                case LevelList.Chapters.MonsaicLines: Helpers.CompleteLocationCheck("Monsaic Lines - Clear"); break; // TODO: Test this one, slightly worried about it.
+                case LevelList.Chapters.MonsaicLines: Helpers.CompleteLocationCheck("Monsaic Lines - Clear"); break;
                 case LevelList.Chapters.Paramonia: Helpers.CompleteLocationCheck("Paramonia - Clear"); break;
                 case LevelList.Chapters.ParamonianNests: Helpers.CompleteLocationCheck("Paramonian Nests - Clear"); break;
                 case LevelList.Chapters.Scrabania: Helpers.CompleteLocationCheck("Scrabania - Clear"); break;
