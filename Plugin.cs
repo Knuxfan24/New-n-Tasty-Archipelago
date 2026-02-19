@@ -18,7 +18,7 @@ using System.Threading;
 
 namespace NNT_Archipealgo
 {
-    [BepInPlugin("K24_NNT_Archipelago", "Archipelago", "0.0.1")]
+    [BepInPlugin("K24_NNT_Archipelago", "Archipelago", "1.0.0")]
     public class Plugin : BaseUnityPlugin
     {
         // Logger.
