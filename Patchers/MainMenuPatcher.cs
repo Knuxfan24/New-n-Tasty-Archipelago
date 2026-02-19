@@ -17,6 +17,7 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(MainMenuController), "InitSaveSlotUI")]
         static bool KillMenuPlusConnect(MainMenuController __instance)
         {
+            // TODO: These two lines don't work on the GOG version.
             // Deactivate the main menu's back button (also gets rid of the social media buttons that are there on the Steam version).
             __instance.m_frontEnd.transform.GetChild(1).transform.GetChild(6).gameObject.SetActive(false);
 

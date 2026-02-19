@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using static JAWStateMachine;
 
 namespace NNT_Archipealgo.Patchers
@@ -6,6 +7,8 @@ namespace NNT_Archipealgo.Patchers
     internal class AbePatcher
     {
         private static readonly MethodInfo dropItem = typeof(Abe).GetMethod("DropPickUp", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly MethodInfo chantParticles = typeof(Abe).GetMethod("DestroyChantParticles", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly MethodInfo sligState = typeof(Slig).GetMethod("EnqueueState", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(SMStates) }, null);
 
         /// <summary>
         /// Holds a reference to the player's object.
@@ -129,28 +132,54 @@ namespace NNT_Archipealgo.Patchers
         /// </summary>
         public static void SetTrapState(SMStates state)
         {
-            // TODO: Receiving a state based trap can cause some weirdness (like regaining control of Abe during a possession).
+            // TODO: Receiving a state based trap can cause some weirdness (like making Abe invisible after a door transition).
             try
             {
-                player?.ReInitStateMachine(state);
+                // Determine if we've possessed a Slig or not.
+                Transform? possessedTarget = Traverse.Create(player).Field("m_cPossessedTarget").GetValue() as Transform;
+                Slig? slig = null;
+                if (possessedTarget != null)
+                    slig = possessedTarget.GetComponent<Slig>();
+
+                // Check that we haven't possessed a Slig.
+                if (slig == null)
+                {
+                    // Set our player state to the one we passed in.
+                    player.ReInitStateMachine(state);
+
+                    // Get rid of the chant stuff.
+                    AkSoundEngine.PostEvent("Stop_Abe_Chant_Loop", player.gameObject);
+                    AkSoundEngine.PostEvent("Reset_Voice_Volume_abe_chant", player.gameObject);
+                    ChantBirdRingContoller ringController = Traverse.Create(player).Field("m_birdRingControl").GetValue() as ChantBirdRingContoller;
+                    ringController.EndRing();
+                    chantParticles.Invoke(player, new object[] { });
+                }
+                else
+                {
+                    // Set our possessed Slig to the wall bonk state and queue up the player idle state in them.
+                    slig.SetState(SMStates.SligBrainlessHitWall);
+                    sligState.Invoke(slig, new object[] { SMStates.SligPlayerIdle });
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// Forces Abe to drop whatever he's carrying (usually a bottlecap).
+        /// Wrapped in a try catch block due to weirdness breaking the item receiver somehow???
+        /// </summary>
+        public static void DropTrap()
+        {
+            try
+            {
+                dropItem.Invoke(player, new object[] { });
             }
             catch
             {
 
             }
         }
-
-        /// <summary>
-        /// Forces Abe to drop whatever he's carrying (usually a bottlecap).
-        /// </summary>
-        public static void DropTrap() => dropItem.Invoke(player, new object[] { });
-
-        //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(Abe), "Update")]
-        //private static void StateTester(Abe __instance)
-        //{
-        //    if (Input.GetKeyDown(KeyCode.F9))
-        //        dropItem.Invoke(player, new object[] { });
-        //}
     }
 }
