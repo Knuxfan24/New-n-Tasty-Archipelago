@@ -28,7 +28,7 @@ namespace NNT_Archipealgo.Patchers
             {
                 // Create our session and attempt to connect with our config settings.
                 Plugin.session = ArchipelagoSessionFactory.CreateSession(Plugin.configServerAddress.Value);
-                LoginResult connectionResult = Plugin.session.TryConnectAndLogin("New 'n' Tasty", Plugin.configSlotName.Value, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems, null, null, null, Plugin.configPassword.Value, true);
+                LoginResult connectionResult = Plugin.session.TryConnectAndLogin("New 'n' Tasty", Plugin.configSlotName.Value, ItemsHandlingFlags.AllItems, null, null, null, Plugin.configPassword.Value, true);
 
                 // Check if the connection failed.
                 if (!connectionResult.Successful)
@@ -37,7 +37,7 @@ namespace NNT_Archipealgo.Patchers
                     LoginFailure connectionFailure = (LoginFailure)connectionResult;
 
                     // Create our error message and push it to the string queue.
-                    string errorMessage = $"Failed to Connect to {Plugin.configServerAddress.Value} as {Plugin.configSlotName.Value} with password {Plugin.configPassword.Value}:";
+                    string errorMessage = $"Failed to connect to {Plugin.configServerAddress.Value} as {Plugin.configSlotName.Value} with password {Plugin.configPassword.Value}:";
                     foreach (string error in connectionFailure.Errors)
                         errorMessage += $"\n{error}";
                     foreach (ConnectionRefusedError error in connectionFailure.ErrorCodes)
