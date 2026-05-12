@@ -145,7 +145,7 @@ namespace NNT_Archipealgo
                     infoTimer = 3f;
                 }
 
-                // If we don't have any messages queued then blank out the string and keep the tiemr at 0.
+                // If we don't have any messages queued then blank out the string and keep the timer at 0.
                 else
                 {
                     infoString = string.Empty;
