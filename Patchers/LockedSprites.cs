@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using NNT_Archipealgo.CustomData;
 
 namespace NNT_Archipealgo.Patchers
 {
@@ -17,6 +18,9 @@ namespace NNT_Archipealgo.Patchers
             // Add a Sprite Renderer with the Lock sprite in it.
             SpriteRenderer renderer = apSprite.AddComponent<SpriteRenderer>();
             renderer.sprite = Helpers.GetCustomSprite($@"{Paths.GameRootPath}\mod_overrides\Archipelago\locked.png");
+
+            // Add the billboard script so the sprite doesn't flip around.
+            apSprite.AddComponent<Billboard>();
         }
 
         [HarmonyPostfix]
