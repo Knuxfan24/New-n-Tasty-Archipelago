@@ -1,4 +1,7 @@
 ﻿// TODO: Clean this up, the thread stuff is basically just copied 1 to 1 from Freedom Planet 2.
+// TODO: Try and fudge a custom connection menu together. While I can't make something in an AssetBundle, maybe I can construct something with some clever trickery?
+// Padlock Sprite sourced from: https://karsiori.itch.io/pixel-art-padlock-pack-animated
+// TODO: Test all the padlock sprites.
 global using HarmonyLib;
 global using System.Collections.Generic;
 global using UnityEngine;
@@ -18,7 +21,7 @@ using System.Threading;
 
 namespace NNT_Archipealgo
 {
-    [BepInPlugin("K24_NNT_Archipelago", "Archipelago", "1.0.0")]
+    [BepInPlugin("K24_NNT_Archipelago", "Archipelago", "1.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         // Logger.
@@ -85,6 +88,7 @@ namespace NNT_Archipealgo
             Harmony.CreateAndPatchAll(typeof(PortalPatcher));
             Harmony.CreateAndPatchAll(typeof(StatusBoardPatcher));
             Harmony.CreateAndPatchAll(typeof(TrialZulagLocationSender));
+            Harmony.CreateAndPatchAll(typeof(LockedSprites));
         }
 
         private void Start()

@@ -27,6 +27,16 @@
                             // Send the location for this Mudokon.
                             Helpers.CompleteLocationCheck(component.ID);
 
+                            // Loop through this Mudokon's object to find the Archipelago indicator and destroy it if it exists (as it otherwise persists through checkpoint reloads).
+                            for (int childIndex = ___m_lstEnteringCharacters[enteringCharacterIndex].childCount - 1; childIndex >= 0; childIndex--)
+                            {
+                                if (___m_lstEnteringCharacters[enteringCharacterIndex].GetChild(childIndex).name == "AP Indicator")
+                                {
+                                    GameObject.Destroy(___m_lstEnteringCharacters[enteringCharacterIndex].GetChild(childIndex).gameObject);
+                                    break;
+                                }
+                            }
+
                             // Send a RingLink if we have our joke RingLink option on.
                             if ((long)Plugin.slotData["ring_link"] != 0)
                                 Plugin.RingLinkMudokonCount++;

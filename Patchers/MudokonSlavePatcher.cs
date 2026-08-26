@@ -1,7 +1,30 @@
-﻿namespace NNT_Archipealgo.Patchers
+﻿using BepInEx;
+
+namespace NNT_Archipealgo.Patchers
 {
     internal class MudokonSlavePatcher
     {
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(MudokonSlave), "Start")]
+        static void CreateAPSprite(MudokonSlave __instance)
+        {
+            // Check that this Mudokon hasn't already been rescued.
+            if (Helpers.CheckLocationExists(__instance.ID) && !Plugin.session.Locations.AllLocationsChecked.Contains(__instance.ID))
+            {
+                // Create a GameObject called AP Indicator.
+                GameObject apSprite = new("AP Indicator");
+
+                // Parent the GameObject to this Mudokon's and shift it to be above their head.
+                apSprite.transform.position = __instance.transform.position;
+                apSprite.transform.parent = __instance.transform;
+                apSprite.transform.localPosition = new(0, 2.2f, 0);
+
+                // Add a Sprite Renderer with the Archipelago logo in it.
+                SpriteRenderer renderer = apSprite.AddComponent<SpriteRenderer>();
+                renderer.sprite = Helpers.GetCustomSprite($@"{Paths.GameRootPath}\mod_overrides\Archipelago\ap_logo.png");
+            }
+        }
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonSlave), "DeathBackEnter")]
         static void DeathBackEnter() => RingLinkLoss();

@@ -1,25 +1,84 @@
 ﻿using Archipelago.MultiClient.Net.Models;
+using BepInEx;
 using NNT_Archipealgo.CustomData;
 using NNT_Archipealgo.Patchers;
+using System;
+using System.IO;
 using static JAWStateMachine;
 
 namespace NNT_Archipealgo
 {
     internal class Helpers
     {
-        public static void HandleItem(KeyValuePair<ArchipelagoItem, int> item, bool fromStart = false, bool trapLink = false)
+        public static void HandleItem(KeyValuePair<ArchipelagoItem, int> item)
         {
             switch (item.Key.ItemName)
             {
-                case "Levers": Plugin.save.HasLevers = true; break;
-                case "Possession": Plugin.save.CanPosses = true; break;
-                case "Grenades": Plugin.save.HasGrenades = true; break;
-                case "Rocks": Plugin.save.HasRocks = true; break;
-                case "UXB Defusion": Plugin.save.CanDefuseUXBs = true; break;
-                case "Lifts": Plugin.save.CanUseLifts = true; break;
-                case "Spirit Rings": Plugin.save.CanUseSpiritRings = true; break;
-                case "Meat": Plugin.save.CanUseMeatSacks = true; break;
-                case "Shrykull": Plugin.save.CanUseShrykull = true; break;
+                case "Levers": 
+                    Plugin.save.HasLevers = true;
+                    var levers = UnityEngine.GameObject.FindObjectsOfType<Lever>();
+                    foreach (var lever in levers)
+                        UnlockElement(lever.transform); 
+                    break;
+
+                case "Possession": 
+                    Plugin.save.CanPosses = true;
+                    var sligs = UnityEngine.GameObject.FindObjectsOfType<Slig>();
+                    foreach (var slig in sligs)
+                        UnlockElement(slig.transform);
+                    break;
+
+                case "Grenades": 
+                    Plugin.save.HasGrenades = true;
+                    var boomMachines = UnityEngine.GameObject.FindObjectsOfType<GrenadeDispenser>();
+                    foreach (var boomMachine in boomMachines)
+                        UnlockElement(boomMachine.transform);
+                    break;
+
+                case "Rocks": Plugin.save.HasRocks = true;
+                    var rockSacks = UnityEngine.GameObject.FindObjectsOfType<RockBag>();
+                    foreach (var rockSack in rockSacks)
+                        if (!rockSack.name.Contains("meat"))
+                        UnlockElement(rockSack.transform);
+                    break;
+
+                case "UXB Defusion": 
+                    Plugin.save.CanDefuseUXBs = true;
+                    var uxbs = UnityEngine.GameObject.FindObjectsOfType<ToggleMine>();
+                    foreach (var uxb in uxbs)
+                        UnlockElement(uxb.transform);
+                    break;
+
+                case "Lifts": 
+                    Plugin.save.CanUseLifts = true;
+                    var lifts = UnityEngine.GameObject.FindObjectsOfType<Elevator>();
+                    foreach (var lift in lifts)
+                        UnlockElement(lift.transform);
+                    var cargoLifts = UnityEngine.GameObject.FindObjectsOfType<CargoElevator>();
+                    foreach (var cargoLift in cargoLifts)
+                        UnlockElement(cargoLift.transform);
+                    break;
+
+                case "Spirit Rings": 
+                    Plugin.save.CanUseSpiritRings = true;
+                    var natives = UnityEngine.GameObject.FindObjectsOfType<MudokonNative>();
+                    foreach (var native in natives)
+                        UnlockElement(native.transform);
+                    break;
+
+                case "Meat": 
+                    Plugin.save.CanUseMeatSacks = true;
+                    var meatSacks = UnityEngine.GameObject.FindObjectsOfType<RockBag>();
+                    foreach (var meatSack in meatSacks)
+                        if (meatSack.name.Contains("meat"))
+                            UnlockElement(meatSack.transform); break;
+
+                case "Shrykull": Plugin.save.CanUseShrykull = true;
+                    var portals = UnityEngine.GameObject.FindObjectsOfType<Portal>();
+                    foreach (var portal in portals)
+                        UnlockElement(portal.transform);
+                    break;
+
                 case "Rescued Mudokon": Plugin.save.MudokonCount += item.Value; break;
 
                 case "Rupture Farms": Plugin.save.UnlockedLocations[0] = true; break;
@@ -39,6 +98,19 @@ namespace NNT_Archipealgo
 
                 // Unhandled items, throw an error into the console.
                 default: Plugin.consoleLog.LogError($"Item Type '{item.Key.ItemName}' (sent by '{item.Key.Source}' {item.Value} time(s)) not yet handled!"); return;
+            }
+
+            static void UnlockElement(Transform obj)
+            {
+                // Loop through the provided object's children in search of an AP Indicator to kill.
+                for (int childIndex = obj.childCount - 1; childIndex >= 0; childIndex--)
+                {
+                    if (obj.GetChild(childIndex).name == "AP Indicator")
+                    {
+                        GameObject.Destroy(obj.GetChild(childIndex).gameObject);
+                        break;
+                    }
+                }
             }
         }
 
@@ -69,6 +141,27 @@ namespace NNT_Archipealgo
                 // If this isn't an item for ourselves, then add a message to our info string queue to be displayed when possible.
                 if (item.Player.Name != Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot))
                     Plugin.infoStringQueue.Add($"Found {item.Player.Name}'s {item.ItemName}.");
+            }
+        }
+
+        /// <summary>
+        /// Loads the specified file as a sprite.
+        /// </summary>
+        public static Sprite GetCustomSprite(string file, float pixelsPerUnit = 100f)
+        {
+            Texture2D texture = GetTexture();
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
+
+            Texture2D GetTexture()
+            {
+                // Set up a new texture using point filtering.
+                Texture2D texture = new(32, 32) { filterMode = FilterMode.Point };
+
+                // Read the sprite for this texture.
+                texture.LoadImage(File.ReadAllBytes(file));
+
+                // Return our custom texture.
+                return texture;
             }
         }
     }
