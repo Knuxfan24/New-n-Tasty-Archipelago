@@ -1,13 +1,13 @@
 ﻿// TODO: Clean this up, the thread stuff is basically just copied 1 to 1 from Freedom Planet 2.
-// TODO: Try and fudge a custom connection menu together. While I can't make something in an AssetBundle, maybe I can construct something with some clever trickery?
 // Padlock Sprite sourced from: https://karsiori.itch.io/pixel-art-padlock-pack-animated
 // TODO: Test all the padlock sprites.
 global using HarmonyLib;
 global using System.Collections.Generic;
 global using UnityEngine;
-
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
+using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BepInEx;
 using BepInEx.Configuration;
@@ -16,8 +16,11 @@ using NNT_Archipealgo.CustomData;
 using NNT_Archipealgo.Patchers;
 using System;
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using Color = UnityEngine.Color;
 
 namespace NNT_Archipealgo
 {
@@ -111,8 +114,157 @@ namespace NNT_Archipealgo
 
         private void OnGUI()
         {
+            // Check if we're not connected to an AP session.
+            if (session == null)
+            {
+                // Find the main menu, aborting if we haven't found it (can't use the SceneManager, so can't just check for the Front_End scene...)
+                MainMenuController menu = UnityEngine.GameObject.FindObjectOfType<MainMenuController>();
+                if (menu == null)
+                    return;
+
+                // Create the GUIStyle for the labels.
+                GUIStyle labelStyle = new(GUI.skin.label)
+                {
+                    fontSize = (int)(32.0f * ((float)Screen.width / (float)1280)),
+                    fontStyle = FontStyle.Bold
+                };
+
+                // Draw the labels, including their shadows which are offset by 2 pixels.
+                Vector2 textPosition = new(Screen.width / 160, Screen.height / 90);
+                labelStyle.normal.textColor = Color.black;
+                GUI.Label(new Rect(textPosition.x + (2 * Screen.width / 1280), textPosition.y + (2 * Screen.height / 720), Screen.width - ((Screen.width / 40) * 2), Screen.height / 18), "Server:", labelStyle);
+                labelStyle.normal.textColor = Color.white;
+                GUI.Label(new Rect(textPosition.x, textPosition.y, Screen.width - ((Screen.width / 40) * 2), Screen.height / 18), "Server:", labelStyle);
+
+                textPosition = new(Screen.width / 160, Screen.height / 15);
+                labelStyle.normal.textColor = Color.black;
+                GUI.Label(new Rect(textPosition.x + (2 * Screen.width / 1280), textPosition.y + (2 * Screen.height / 720), Screen.width - ((Screen.width / 40) * 2), Screen.height / 18), "Slot:", labelStyle);
+                labelStyle.normal.textColor = Color.white;
+                GUI.Label(new Rect(textPosition.x, textPosition.y, Screen.width - ((Screen.width / 40) * 2), Screen.height / 18), "Slot:", labelStyle);
+
+                textPosition = new(Screen.width / 160, Screen.height / 8.2f);
+                labelStyle.normal.textColor = Color.black;
+                GUI.Label(new Rect(textPosition.x + (2 * Screen.width / 1280), textPosition.y + (2 * Screen.height / 720), Screen.width - ((Screen.width / 40) * 2), Screen.height / 18), "Password:", labelStyle);
+                labelStyle.normal.textColor = Color.white;
+                GUI.Label(new Rect(textPosition.x, textPosition.y, Screen.width - ((Screen.width / 40) * 2), Screen.height / 18), "Password:", labelStyle);
+
+                // Create the GUIStyle for the text boxes.
+                GUIStyle textBoxStyle = new(GUI.skin.textField)
+                {
+                    fontSize = (int)(32.0f * ((float)Screen.width / (float)1280))
+                };
+
+                // Draw the text boxes and link them to the config values.
+                configServerAddress.Value = GUI.TextField(new Rect(Screen.width / 7, Screen.height / 90, (Screen.width / 2.35f) * 2, Screen.height / 18), configServerAddress.Value, textBoxStyle);
+                configSlotName.Value = GUI.TextField(new Rect(Screen.width / 7, Screen.height / 15, (Screen.width / 2.35f) * 2, Screen.height / 18), configSlotName.Value, textBoxStyle);
+                configPassword.Value = GUI.TextField(new Rect(Screen.width / 7, Screen.height / 8.2f, (Screen.width / 2.35f) * 2, Screen.height / 18), configPassword.Value, textBoxStyle);
+
+                // Create the GUIStyle for the connect button..
+                GUIStyle buttonStyle = new(GUI.skin.button)
+                {
+                    fontSize = (int)(32.0 * (Screen.width / 1280)),
+                    fontStyle = FontStyle.Bold,
+                };
+
+                // Draw the connect button and check for its click.
+                if (GUI.Button(new(Screen.width / 160, Screen.height - (Screen.height / 12.86f), Screen.width - ((Screen.width / 160) * 2), (Screen.height / 15)), "Connect", buttonStyle))
+                {
+                    // Create our session and attempt to connect with our config settings.
+                    session = ArchipelagoSessionFactory.CreateSession(Plugin.configServerAddress.Value);
+                    LoginResult connectionResult = session.TryConnectAndLogin("New 'n' Tasty", Plugin.configSlotName.Value, ItemsHandlingFlags.AllItems, null, null, null, Plugin.configPassword.Value, true);
+
+                    // Check if the connection failed.
+                    if (!connectionResult.Successful)
+                    {
+                        // Get the failure data.
+                        LoginFailure connectionFailure = (LoginFailure)connectionResult;
+
+                        // Create our error message and push it to the string queue.
+                        string errorMessage = $"Failed to connect to {configServerAddress.Value} as {configSlotName.Value} with password {configPassword.Value}:";
+                        foreach (string error in connectionFailure.Errors)
+                            errorMessage += $"\n{error}";
+                        foreach (ConnectionRefusedError error in connectionFailure.ErrorCodes)
+                            errorMessage += $"\n{error}";
+                        errorMessage += $"\n\nCheck your connection settings.";
+                        infoStringQueue.Add(errorMessage);
+
+                        // Null out the session and stop here.
+                        session = null;
+                        return;
+                    }
+
+                    // Get the success data.
+                    LoginSuccessful connectionSuccess = (LoginSuccessful)connectionResult;
+
+                    // Push our connected message to the string queue.
+                    infoStringQueue.Add($"Connected to {configServerAddress.Value} as {configSlotName.Value}");
+
+                    // Get the slot data and debug print it.
+                    slotData = connectionSuccess.SlotData;
+                    foreach (var key in slotData)
+                        consoleLog.LogDebug($"{key.Key}: {key.Value} (Type: {key.Value.GetType()})");
+
+                    // Create and setup DeathLink stuff, enabling it if needed.
+                    DeathLink = session.CreateDeathLinkService();
+                    DeathLink.OnDeathLinkReceived += SocketEvents.Socket_ReceiveDeathLink;
+                    if ((long)slotData["death_link"] != 0)
+                        DeathLink.EnableDeathLink();
+                    AbePatcher.deathLinkAmnesty = (int)(long)slotData["death_link_amnesty"];
+
+                    // Add the RingLink tag if its enabled in our slot data.
+                    if ((long)slotData["ring_link"] != 0)
+                        session.ConnectionInfo.UpdateConnectionOptions([.. session.ConnectionInfo.Tags, .. new string[1] { "RingLink" }]);
+
+                    // Create the handler for item receives.
+                    session.Items.ItemReceived += SocketEvents.Socket_ReceiveItem;
+
+                    // Start the item queue timer.
+                    itemQueueTimer = 1f;
+
+                    // Loop through and handle each item that has previously been received.
+                    foreach (ItemInfo item in session.Items.AllItemsReceived)
+                    {
+                        SocketEvents.SetUpQueue(item);
+                        session.Items.DequeueItem();
+                    }
+
+                    // Set up the handler to update the remaining locations count on the Status Boards.
+                    session.Locations.CheckedLocationsUpdated += SocketEvents.Socket_UpdateRemainingLocationsCount;
+
+                    // Create our internal Archipelago save.
+                    save = new()
+                    {
+                        RemainingLocations = session.Locations.AllLocations.Count - session.Locations.AllLocationsChecked.Count
+                    };
+
+                    // Fetch all the locations.
+                    ReadOnlyCollection<long> locations = session.Locations.AllLocations;
+                    session.Locations.ScoutLocationsAsync(items =>
+                    {
+                        save.items = items;
+                    },
+                    false, [.. locations]);
+
+                    // Delete save slot 24 if it exists.
+                    // The GOG version doesn't even have the Steam Manager, so we specifically need to compile it out.
+                    #if !GOG
+                    if (File.Exists($"SaveGame/{SteamManager.GetInstance.GetAccountID()}/SaveSlot24.NnT"))
+                        File.Delete($"SaveGame/{SteamManager.GetInstance.GetAccountID()}/SaveSlot24.NnT");
+                    #else
+                    if (File.Exists($"SaveGame/SaveSlot24.NnT"))
+                        File.Delete($"SaveGame/SaveSlot24.NnT");
+                    #endif
+
+                    // Load the now nonexistant save slot 24.
+                    App.getInstance().LoadSaveFile(24);
+
+                    // Force the menu to advance to the main menu.
+                    menu.SaveSlotToFrontEnd();
+                }
+            }
+
             // Create the text style.
-            GUIStyle textStyle = new()
+            GUIStyle notificationLogStyle = new()
             {
                 fontSize = (int)(32.0 * (Screen.width / 1280)),
                 fontStyle = FontStyle.Bold,
@@ -120,12 +272,12 @@ namespace NNT_Archipealgo
             };
 
             // Set the style's colour to black and write the info string with a 2 pixel offset to create a drop shadow.
-            textStyle.normal.textColor = Color.black;
-            GUI.Label(new Rect(2, 2, Screen.width, Screen.height), infoString, textStyle);
+            notificationLogStyle.normal.textColor = Color.black;
+            GUI.Label(new Rect(2, 2, Screen.width, Screen.height), infoString, notificationLogStyle);
 
             // Set the style's colour back to white and write the info string without an offset.
-            textStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(0, 0, Screen.width, Screen.height), infoString, textStyle);
+            notificationLogStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(0, 0, Screen.width, Screen.height), infoString, notificationLogStyle);
         }
 
         private void Update()

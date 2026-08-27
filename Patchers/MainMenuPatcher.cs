@@ -1,10 +1,4 @@
-﻿using Archipelago.MultiClient.Net;
-using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
-using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Models;
-using System.Collections.ObjectModel;
-using System.IO;
-using static MainMenuController;
+﻿using static MainMenuController;
 
 namespace NNT_Archipealgo.Patchers
 {
@@ -22,101 +16,6 @@ namespace NNT_Archipealgo.Patchers
 
             // Deactivate the chapter select's back button.
             __instance.m_levelSelect.transform.GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(false);
-
-            // Check that we're not already connected to the server.
-            if (Plugin.session == null)
-            {
-                // Create our session and attempt to connect with our config settings.
-                Plugin.session = ArchipelagoSessionFactory.CreateSession(Plugin.configServerAddress.Value);
-                LoginResult connectionResult = Plugin.session.TryConnectAndLogin("New 'n' Tasty", Plugin.configSlotName.Value, ItemsHandlingFlags.AllItems, null, null, null, Plugin.configPassword.Value, true);
-
-                // Check if the connection failed.
-                if (!connectionResult.Successful)
-                {
-                    // Get the failure data.
-                    LoginFailure connectionFailure = (LoginFailure)connectionResult;
-
-                    // Create our error message and push it to the string queue.
-                    string errorMessage = $"Failed to connect to {Plugin.configServerAddress.Value} as {Plugin.configSlotName.Value} with password {Plugin.configPassword.Value}:";
-                    foreach (string error in connectionFailure.Errors)
-                        errorMessage += $"\n{error}";
-                    foreach (ConnectionRefusedError error in connectionFailure.ErrorCodes)
-                        errorMessage += $"\n{error}";
-                    errorMessage += $"\n\nCheck your config settings and restart the game.";
-                    Plugin.infoStringQueue.Add(errorMessage);
-
-                    // Stop running the rest of the function, leaving us on a blank menu screen.
-                    return false;
-                }
-
-                // Get the success data.
-                LoginSuccessful connectionSuccess = (LoginSuccessful)connectionResult;
-
-                // Push our connected message to the string queue.
-                Plugin.infoStringQueue.Add($"Connected to {Plugin.configServerAddress.Value} as {Plugin.configSlotName.Value}");
-
-                // Get the slot data and debug print it.
-                Plugin.slotData = connectionSuccess.SlotData;
-                foreach (var key in Plugin.slotData)
-                    Plugin.consoleLog.LogDebug($"{key.Key}: {key.Value} (Type: {key.Value.GetType()})");
-
-                // Create and setup DeathLink stuff, enabling it if needed.
-                Plugin.DeathLink = Plugin.session.CreateDeathLinkService();
-                Plugin.DeathLink.OnDeathLinkReceived += SocketEvents.Socket_ReceiveDeathLink;
-                if ((long)Plugin.slotData["death_link"] != 0)
-                    Plugin.DeathLink.EnableDeathLink();
-                AbePatcher.deathLinkAmnesty = (int)(long)Plugin.slotData["death_link_amnesty"];
-
-                // Add the RingLink tag if its enabled in our slot data.
-                if ((long)Plugin.slotData["ring_link"] != 0)
-                    Plugin.session.ConnectionInfo.UpdateConnectionOptions([.. Plugin.session.ConnectionInfo.Tags, .. new string[1] { "RingLink" }]);
-
-                // Create the handler for item receives.
-                Plugin.session.Items.ItemReceived += SocketEvents.Socket_ReceiveItem;
-
-                // Start the item queue timer.
-                Plugin.itemQueueTimer = 1f;
-
-                // Loop through and handle each item that has previously been received.
-                foreach (ItemInfo item in Plugin.session.Items.AllItemsReceived)
-                {
-                    SocketEvents.SetUpQueue(item);
-                    Plugin.session.Items.DequeueItem();
-                }
-
-                // Set up the handler to update the remaining locations count on the Status Boards.
-                Plugin.session.Locations.CheckedLocationsUpdated += SocketEvents.Socket_UpdateRemainingLocationsCount;
-
-                // Create our internal Archipelago save.
-                Plugin.save = new()
-                {
-                    RemainingLocations = Plugin.session.Locations.AllLocations.Count - Plugin.session.Locations.AllLocationsChecked.Count
-                };
-
-                // Fetch all the locations.
-                ReadOnlyCollection<long> locations = Plugin.session.Locations.AllLocations;
-                Plugin.session.Locations.ScoutLocationsAsync(items =>
-                {
-                    Plugin.save.items = items;
-                },
-                false, [.. locations]);
-            }
-
-            // Delete save slot 24 if it exists.
-            // The GOG version doesn't even have the Steam Manager, so we specifically need to compile it out.
-            #if !GOG
-            if (File.Exists($"SaveGame/{SteamManager.GetInstance.GetAccountID()}/SaveSlot24.NnT"))
-                File.Delete($"SaveGame/{SteamManager.GetInstance.GetAccountID()}/SaveSlot24.NnT");
-            #else
-            if (File.Exists($"SaveGame/SaveSlot24.NnT"))
-                File.Delete($"SaveGame/SaveSlot24.NnT");
-            #endif
-
-            // Load the now nonexistant save slot 24.
-            App.getInstance().LoadSaveFile(24);
-
-            // Force the menu controller to move to the main menu.
-            __instance.SaveSlotToFrontEnd();
 
             // Stop the original function from running so we don't end up with a left over save select menu.
             return false;
