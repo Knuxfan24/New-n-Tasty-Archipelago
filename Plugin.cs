@@ -114,7 +114,7 @@ namespace NNT_Archipealgo
             // Create the text style.
             GUIStyle textStyle = new()
             {
-                fontSize = 32,
+                fontSize = (int)(32.0 * (Screen.width / 1280)),
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.LowerCenter
             };
