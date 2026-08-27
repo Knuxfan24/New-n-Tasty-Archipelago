@@ -33,6 +33,8 @@ namespace NNT_Archipealgo
         public static ConfigEntry<string> configServerAddress;
         public static ConfigEntry<string> configSlotName;
         public static ConfigEntry<string> configPassword;
+        public static ConfigEntry<bool> configJokeSigns;
+        public static ConfigEntry<bool> configJokeSignsTutorials;
 
         public static ArchipelagoSession session;
         public static Dictionary<string, object> slotData;
@@ -82,15 +84,28 @@ namespace NNT_Archipealgo
                                          "",
                                          "The password for the server we're connecting to (leave blank if no password is required).");
 
+            configJokeSigns = Config.Bind("Joke Signs",
+                                          "Enabled",
+                                          true,
+                                          "Replaces the scrolling signs in Rupture Farms with jokes referencing memes and other games.");
+
+            configJokeSignsTutorials = Config.Bind("Joke Signs",
+                                                   "Include Tutorial Signs",
+                                                   false,
+                                                   "Overwrites the tutorial signs with jokes as well.");
+
+
             // Patch all the functions that need patching.
             Harmony.CreateAndPatchAll(typeof(AbePatcher));
             Harmony.CreateAndPatchAll(typeof(AppPatcher));
-            Harmony.CreateAndPatchAll(typeof(DisableAbilities));
+            Harmony.CreateAndPatchAll(typeof(LEDScreenPatcher));
             Harmony.CreateAndPatchAll(typeof(MainMenuPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonSlavePatcher));
             Harmony.CreateAndPatchAll(typeof(PortalPatcher));
             Harmony.CreateAndPatchAll(typeof(StatusBoardPatcher));
             Harmony.CreateAndPatchAll(typeof(TrialZulagLocationSender));
+
+            Harmony.CreateAndPatchAll(typeof(DisableAbilities));
             Harmony.CreateAndPatchAll(typeof(LockedSprites));
         }
 
