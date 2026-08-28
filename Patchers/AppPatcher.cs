@@ -6,6 +6,13 @@ namespace NNT_Archipealgo.Patchers
     internal class AppPatcher
     {
         /// <summary>
+        /// Sets the required Mudokon count for the good ending to -1, forcing it to always play that one.
+        /// </summary>
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(App), "Start")]
+        static void ForceGoodEnding(ref int ___m_nMudokonsNeededForGoodEnding) => ___m_nMudokonsNeededForGoodEnding = -1;
+
+        /// <summary>
         /// Determines whether or not a chapter should be unlocked or not.
         /// </summary>
         [HarmonyPrefix]
@@ -91,7 +98,7 @@ namespace NNT_Archipealgo.Patchers
                     break;
             }
 
-            // Return to the menu if we're not in either of the Temples or the goal areas.
+            // Return to the menu if we're not in either of the goal areas.
             if (___m_eCurrentChapter is not LevelList.Chapters.TheBoardroom and not
                                             LevelList.Chapters.Alf)
                 App.getInstance().QuitGameToFrontEnd(false);

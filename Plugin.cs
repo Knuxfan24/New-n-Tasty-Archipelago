@@ -94,12 +94,12 @@ namespace NNT_Archipealgo
                                                    false,
                                                    "Overwrites the tutorial signs with jokes as well.");
 
-
             // Patch all the functions that need patching.
             Harmony.CreateAndPatchAll(typeof(AbePatcher));
             Harmony.CreateAndPatchAll(typeof(AppPatcher));
             Harmony.CreateAndPatchAll(typeof(LEDScreenPatcher));
             Harmony.CreateAndPatchAll(typeof(MainMenuPatcher));
+            Harmony.CreateAndPatchAll(typeof(MudokonListPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonSlavePatcher));
             Harmony.CreateAndPatchAll(typeof(PortalPatcher));
             Harmony.CreateAndPatchAll(typeof(StatusBoardPatcher));

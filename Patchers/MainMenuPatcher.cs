@@ -5,21 +5,22 @@ namespace NNT_Archipealgo.Patchers
     internal class MainMenuPatcher
     {
         /// <summary>
-        /// Connects to the AP server while also stopping the save select screen from showing.
+        /// Disables the back buttons on the main menu and chapter select.
         /// </summary>
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(MainMenuController), "InitSaveSlotUI")]
-        static bool KillMenuPlusConnect(MainMenuController __instance)
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(MainMenuController), "Start")]
+        static void DisableBackButtons(MainMenuController __instance)
         {
             // Deactivate the main menu's back button (also gets rid of the social media buttons that are there on the Steam version).
             __instance.m_frontEnd.transform.GetChild(1).transform.GetChild(6).gameObject.SetActive(false);
 
             // Deactivate the chapter select's back button.
             __instance.m_levelSelect.transform.GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(false);
-
-            // Stop the original function from running so we don't end up with a left over save select menu.
-            return false;
         }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MainMenuController), "InitSaveSlotUI")]
+        static bool DisableSaveUI() => false;
 
         /// <summary>
         /// Forces the game to go to the chapter select rather than starting a new game.
@@ -60,25 +61,16 @@ namespace NNT_Archipealgo.Patchers
         /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(LeaderBoardDataHandler), "UpdateLeaderBoardHandler")]
+        [HarmonyPatch(typeof(LeaderBoardDataHandler), "UploadToLeaderBoards")]
         static bool DisableLeaderBoardData() => false;
 
         /// <summary>
-        /// Disables the back button on the main menu.
+        /// Disables the back button on the main menu and chapter select.
         /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MainMenuController), "BackToSaveSlotSelect")]
-        static bool DisableReturnToSaveSelect(ref bool ___m_bDoBackOutcome)
-        {
-            ___m_bDoBackOutcome = false;
-            return false;
-        }
-
-        /// <summary>
-        /// Disables the back button on the chapter select.
-        /// </summary>
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(MainMenuController), "BackToBegin")]
-        static bool DisableReturnToMenu(ref bool ___m_bDoBackOutcome)
+        static bool DisableReturnToSaveSelect(ref bool ___m_bDoBackOutcome)
         {
             ___m_bDoBackOutcome = false;
             return false;
