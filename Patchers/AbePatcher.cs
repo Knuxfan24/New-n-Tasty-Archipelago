@@ -76,8 +76,8 @@ namespace NNT_Archipealgo.Patchers
         [HarmonyPatch(typeof(Abe), "Kill")]
         static void SendDeathLink(ref TakeDamageMessage cTakeDamageMessage)
         {
-            // Temporarily display the death damage type so we can figure out what maps to what and make messages for them.
-            Plugin.consoleLog.LogDebug(cTakeDamageMessage.Type);
+            // DEBUG: Log the death source.
+            //Plugin.consoleLog.LogDebug(cTakeDamageMessage.Type);
 
             // Only do any of this if we can send a DeathLink and have it enabled.
             if (!canSendDeathLink || (long)Plugin.slotData["death_link"] == 0)
@@ -104,7 +104,7 @@ namespace NNT_Archipealgo.Patchers
             {
                 case TakeDamageMessage.Types.Explosion: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} blew up."; break;
                 case TakeDamageMessage.Types.Shot: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got shot."; break;
-                case TakeDamageMessage.Types.Fall: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} fell in a hole."; break;
+                case TakeDamageMessage.Types.Fall: case TakeDamageMessage.Types.DeathPlane: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} fell in a hole."; break;
                 case TakeDamageMessage.Types.Bees: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got stung."; break;
                 case TakeDamageMessage.Types.Bat: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got bit."; break;
                 case TakeDamageMessage.Types.Zap: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got electrocuted."; break;
@@ -112,8 +112,12 @@ namespace NNT_Archipealgo.Patchers
                 case TakeDamageMessage.Types.Scrab: reason = $"A Scrab got revenge on {Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}."; break;
                 case TakeDamageMessage.Types.Slog: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} became Slog food."; break;
                 case TakeDamageMessage.Types.Paramite: reason = $"A Paramite got revenge on {Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)}."; break;
-                case TakeDamageMessage.Types.DeathPlane: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} fell in a hole."; break;
-                default: Plugin.consoleLog.LogWarning($"Death Type {cTakeDamageMessage.Type} not handled for unique message!"); break;
+                case TakeDamageMessage.Types.Impender: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} failed to be Indiana Jones."; break;
+                case TakeDamageMessage.Types.Gas: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} was too slow and choked to death."; break;
+                case TakeDamageMessage.Types.SwingingRock: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got smacked by a rock."; break;
+                case TakeDamageMessage.Types.SlingShot: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} took a slingshot to the face."; break;
+                case TakeDamageMessage.Types.FallingMeat: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got a concussion."; break;
+                default: Plugin.consoleLog.LogWarning($"Death Type {cTakeDamageMessage.Type} not handled for unique message!"); break; // In theory only Depossession and Shrykull don't have a message, which Abe shouldn't ever be killed by?
             }
 
             // Send a DeathLink with our reason.
