@@ -95,39 +95,39 @@ namespace NNT_Archipealgo.Patchers
             {
                 case 0:
                     ___lines[1].text = "Levers:";
-                    ___lines[4].text = Plugin.save.HasLevers ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.HasLevers ? "✓" : "✗";
                     break;
                 case 1:
                     ___lines[1].text = "Possession:";
-                    ___lines[4].text = Plugin.save.CanPosses ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.CanPosses ? "✓" : "✗";
                     break;
                 case 2:
                     ___lines[1].text = "Grenades:";
-                    ___lines[4].text = Plugin.save.HasGrenades ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.HasGrenades ? "✓" : "✗";
                     break;
                 case 3:
                     ___lines[1].text = "Rocks:";
-                    ___lines[4].text = Plugin.save.HasRocks ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.HasRocks ? "✓" : "✗";
                     break;
                 case 4:
                     ___lines[1].text = "UXB Defusion:";
-                    ___lines[4].text = Plugin.save.CanDefuseUXBs ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.CanDefuseUXBs ? "✓" : "✗";
                     break;
                 case 5:
                     ___lines[1].text = "Lifts:";
-                    ___lines[4].text = Plugin.save.CanUseLifts ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.CanUseLifts ? "✓" : "✗";
                     break;
                 case 6:
                     ___lines[1].text = "Spirit Rings:";
-                    ___lines[4].text = Plugin.save.CanUseSpiritRings ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.CanUseSpiritRings ? "✓" : "✗";
                     break;
                 case 7:
                     ___lines[1].text = "Meat:";
-                    ___lines[4].text = Plugin.save.CanUseMeatSacks ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.CanUseMeatSacks ? "✓" : "✗";
                     break;
                 case 8:
                     ___lines[1].text = "Shrykull:";
-                    ___lines[4].text = Plugin.save.CanUseShrykull ? "Yes" : "No";
+                    ___lines[4].text = Plugin.save.CanUseShrykull ? "✓" : "✗";
                     break;
                 case 9:
                     ___lines[1].text = "DL Amnesty:";
