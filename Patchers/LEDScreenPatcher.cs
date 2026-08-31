@@ -94,6 +94,10 @@ namespace NNT_Archipealgo.Patchers
             new("Hear the words of O-Lir, last Sentinel of the Fortress Temple. May they serve you well."), // Reference to Metroid Prime 2: Echoes.
             new("you got games on your phone?"),
             new("It was foretold by Gyromancy!"), // Reference to Silent Hill.
+            new("It's a lovely morning on Oddworld, and you are a horrible goose."), // Reference to Untitled Goose Game.
+            new("Look at you, hacker: a pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge a perfect, immortal machine?"), // Reference to System Shock.
+            new("Still can't cross the Sahara Desert? Try camels."), // Reference to The History of the Entire World.
+            new("BREAKING NEWS! Guardian genie fired.                                Again..."), // Reference to the Shantae series.
         ];
 
         [HarmonyPrefix]
