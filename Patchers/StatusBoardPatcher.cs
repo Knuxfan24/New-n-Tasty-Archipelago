@@ -79,7 +79,7 @@ namespace NNT_Archipealgo.Patchers
 
             // Set the third line to the count of rescued Mudokons, using the original Escapees string.
             ___lines[2].text = LanguageManager.GetText("env_statusboard_escapees") + ":";
-            ___lines[5].text = Plugin.save.MudokonCount.ToString();
+            ___lines[5].text = $"{Plugin.save.MudokonCount}/{Plugin.slotData["required_muds"]}";
 
             // If the timer is below 0, then set the second line to our random strings and return.
             if (genericTimer < 0)
