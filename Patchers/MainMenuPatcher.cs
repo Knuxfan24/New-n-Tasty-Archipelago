@@ -46,14 +46,46 @@ namespace NNT_Archipealgo.Patchers
         static bool DisableButtonRemovalFromList() => false;
 
         /// <summary>
-        /// Forces each chapter select button to run its DoToggleLocked function when the chapter select calls for chapter info.
+        /// Lock/Unlock Chapters on the menu and change unused ones to the NOT IN SEED string.
         /// </summary>
-        [HarmonyPrefix]
+        [HarmonyPostfix]
         [HarmonyPatch(typeof(ChapterSelectPanel), "SetChapterInfo")]
+        [HarmonyPatch(typeof(ChapterSelectPanel), "UpdateButtons")]
         static void HandleChapterLocks(ref ScrollViewButton[] ___m_acScrollViewButtons)
         {
-            foreach (ScrollViewButton button in ___m_acScrollViewButtons)
+            // Loop through each button, specifically as a ChapterSelectButton rather than a generic ScrollViewButton.
+            foreach (ChapterSelectButton button in ___m_acScrollViewButtons)
+            {
+                // Lock/Unlock this button.
                 button.DoToggleLocked();
+
+                // If we're not using Extra Area Clears, then set the NOT IN SEED value on the unused areas.
+                if ((button.m_eChapter is LevelList.Chapters.MonsaicLines or
+                                         LevelList.Chapters.Paramonia or
+                                         LevelList.Chapters.ParamonianNests or
+                                         LevelList.Chapters.Scrabania or
+                                         LevelList.Chapters.ScrabanianNests or
+                                         LevelList.Chapters.FreeFireZone) &&
+                                         ((long)Plugin.slotData["area_clears"] == 0 || (long)Plugin.slotData["extra_area_clears"] == 0))
+                    button.m_cJAWMenuLocalisation.SetKey("AP_NotInSeed");
+
+                // Set the NOT IN SEED value on the unused goal area.
+                if (button.m_eChapter == LevelList.Chapters.TheBoardroom && (long)Plugin.slotData["goal"] == 1)
+                    button.m_cJAWMenuLocalisation.SetKey("AP_NotInSeed");
+                if (button.m_eChapter == LevelList.Chapters.Alf && (long)Plugin.slotData["goal"] == 0)
+                    button.m_cJAWMenuLocalisation.SetKey("AP_NotInSeed");
+            }
+        }
+
+        /// <summary>
+        /// Replaces the BAD KEY output from a missing string call with NOT IN SEED if the passed in key was "AP_NotInSeed".
+        /// </summary>
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(LanguagePack), "GetString")]
+        static void CustomLockString(ref string key, ref string __result)
+        {
+            if (key == "AP_NotInSeed")
+                __result = "NOT IN SEED";
         }
 
         /// <summary>
