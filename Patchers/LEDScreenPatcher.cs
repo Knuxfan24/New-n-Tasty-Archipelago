@@ -98,7 +98,9 @@ namespace NNT_Archipealgo.Patchers
             new("Look at you, hacker: a pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge a perfect, immortal machine?"), // Reference to System Shock.
             new("Still can't cross the Sahara Desert? Try camels."), // Reference to The History of the Entire World.
             new("BREAKING NEWS! Guardian genie fired.                                Again..."), // Reference to the Shantae series.
-            new("What is the square root of a fish? Now I'm sad.") // Reference to Skullgirls.
+            new("What is the square root of a fish? Now I'm sad."), // Reference to Skullgirls.
+            new("Momentum, a function of mass and velocity, is conserved between portals. In layman's terms, speedy thing goes in, speedy thing comes out."), // Reference to Portal.
+            new("y cant metroid crawl?"), // Reference to the "y cant metroid crawl" meme.
         ];
 
         [HarmonyPrefix]

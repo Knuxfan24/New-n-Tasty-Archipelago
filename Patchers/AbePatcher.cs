@@ -86,10 +86,11 @@ namespace NNT_Archipealgo.Patchers
             // Disable the send flag so we don't send multiple (mines were especially bad with this).
             canSendDeathLink = false;
 
-            // If we have any amnesty left, then decrement the counter and stop here.
+            // If we have any amnesty left, then decrement the counter, remind the player how many points are left in the amnesty and stop here.
             if (deathLinkAmnesty != 0)
             {
                 deathLinkAmnesty--;
+                Plugin.infoStringQueue.Add($"Death forgiven. {deathLinkAmnesty} forgivable deaths remain.");
                 return;
             }
 
