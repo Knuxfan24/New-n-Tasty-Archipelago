@@ -102,6 +102,7 @@ namespace NNT_Archipealgo
             Harmony.CreateAndPatchAll(typeof(MudokonListPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonSlavePatcher));
             Harmony.CreateAndPatchAll(typeof(PortalPatcher));
+            Harmony.CreateAndPatchAll(typeof(ScriptedObjectPatcher));
             Harmony.CreateAndPatchAll(typeof(StatusBoardPatcher));
             Harmony.CreateAndPatchAll(typeof(TrialZulagLocationSender));
 
