@@ -1,6 +1,6 @@
 ﻿// TODO: Clean this up, the thread stuff is basically just copied 1 to 1 from Freedom Planet 2.
 // Padlock Sprite sourced from: https://karsiori.itch.io/pixel-art-padlock-pack-animated
-// TODO: Test all the padlock sprites.
+// DVD Screensaver Logo sourced from: https://commons.wikimedia.org/wiki/File:DVD_logo.svg
 global using HarmonyLib;
 global using System.Collections.Generic;
 global using UnityEngine;
@@ -30,38 +30,52 @@ namespace NNT_Archipealgo
         // Logger.
         public static ManualLogSource consoleLog;
 
+        // The config options.
         public static ConfigEntry<string> configServerAddress;
         public static ConfigEntry<string> configSlotName;
         public static ConfigEntry<string> configPassword;
         public static ConfigEntry<bool> configJokeSigns;
         public static ConfigEntry<bool> configJokeSignsTutorials;
 
+        // The AP session's data.
         public static ArchipelagoSession session;
         public static Dictionary<string, object> slotData;
         public static DeathLinkService DeathLink;
 
+        // The AP's save.
         public static ArchipelagoSave save;
 
+        // The item queue and its timer.
         public static Dictionary<ArchipelagoItem, int> itemQueue = [];
         public static float itemQueueTimer = -1;
 
+        // The message queue's values.
         public static string infoString = string.Empty;
         public static List<string> infoStringQueue = [];
         public static float infoTimer = 0f;
 
+        // Random Number Generator.
         public static System.Random rng = new();
 
+        // Background bounce-packet sender to keep SendPacket off the main thread.
         private static readonly Queue<LocationData> LocationQueue = new();
         private static readonly AutoResetEvent LocationSignal = new(false);
         private static Thread locationThread;
 
-        // Background bounce-packet sender to keep SendPacket off the main thread.
         private static readonly Queue<BouncePacket> BounceQueue = new();
         private static readonly AutoResetEvent BounceSignal = new(false);
         private static Thread bounceThread;
 
         // RingLink based values.
         public static int RingLinkMudokonCount = 0;
+
+        // DVD Screensaver Trap values.
+        public static float DVDTimer = 0;
+        public static float DVDXPos = (Screen.width / 2) - 128;
+        public static float DVDYPos = (Screen.height / 2) - 128;
+        public static bool DVDRight = true;
+        public static bool DVDUp = true;
+        public static Color DVDColour = Color.white;
 
         private void Awake()
         {
@@ -129,6 +143,16 @@ namespace NNT_Archipealgo
 
         private void OnGUI()
         {
+            // If the DVD Screensaver Trap timer is above 0, then set the GUI colour to the random logo colour and draw the icon.
+            if (DVDTimer > 0)
+            {
+                GUI.color = DVDColour;
+                GUI.DrawTexture(new Rect(DVDXPos, DVDYPos, 256f * ((float)Screen.width / (float)1280), 256f * ((float)Screen.height / (float)720)), Helpers.GetTexture($@"{Paths.GameRootPath}\mod_overrides\Archipelago\dvd_screensaver.png"), ScaleMode.ScaleToFit, true, 0f);
+            }
+
+            // Reset the GUI colour to white to not interfere with the other UI elements.
+            GUI.color = Color.white;
+
             // Check if we're not connected to an AP session.
             if (session == null)
             {
@@ -243,6 +267,9 @@ namespace NNT_Archipealgo
                         session.Items.DequeueItem();
                     }
 
+                    // Reset the DVD Screensaver Trap timer so we don't have a long lingering one from previously received copies of the trap.
+                    DVDTimer = 0;
+
                     // Set up the handler to update the remaining locations count on the Status Boards.
                     session.Locations.CheckedLocationsUpdated += SocketEvents.Socket_UpdateRemainingLocationsCount;
 
@@ -297,6 +324,24 @@ namespace NNT_Archipealgo
 
         private void Update()
         {
+            static void GenerateColour() => DVDColour = new((float)rng.NextDouble(), (float)rng.NextDouble(), (float)rng.NextDouble());
+
+            // Check if the DVD Screensaver is active and decrement its timer if so.
+            if (DVDTimer > 0)
+                DVDTimer -= Time.deltaTime;
+
+            // Bounce the DVD logo off edges and picking a new colour with each bounce.
+            if (DVDXPos >= Screen.width - (256 * ((float)Screen.width / (float)1280))) { DVDRight = false; GenerateColour(); }
+            if (DVDXPos <= 0) { DVDRight = true; GenerateColour(); }
+            if (DVDYPos >= Screen.height - (184 * ((float)Screen.height / (float)720))) { DVDUp = true; GenerateColour(); }
+            if (DVDYPos <= (-72 * ((float)Screen.height / (float)720))) { DVDUp = false; GenerateColour(); }
+
+            // Move the DVD logo based on its Right and Up values.
+            if (DVDRight) DVDXPos += 8 * (Screen.width / 1280);
+            else DVDXPos -= 8 * (Screen.width / 1280);
+            if (DVDUp) DVDYPos -= 8 * (Screen.height / 720);
+            else DVDYPos += 8 * (Screen.height / 720);
+
             // Decrement the timer by the game's delta time.
             infoTimer -= Time.deltaTime;
 

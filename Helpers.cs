@@ -95,6 +95,7 @@ namespace NNT_Archipealgo
                 case "Trip Trap": case "lol brawl reference": AbePatcher.SetTrapState(SMStates.AbeLandDamage); break;
                 case "QuikSave Trap": App.getInstance().SaveQuickSave(); break;
                 case "Drop Trap": AbePatcher.DropTrap(); break;
+                case "DVD Screensaver Trap": Plugin.DVDTimer += 60 * item.Value; break;
 
                 // Unhandled items, throw an error into the console.
                 default: Plugin.consoleLog.LogError($"Item Type '{item.Key.ItemName}' (sent by '{item.Key.Source}' {item.Value} time(s)) not yet handled!"); return;
@@ -145,24 +146,23 @@ namespace NNT_Archipealgo
         }
 
         /// <summary>
-        /// Loads the specified file as a sprite.
+        /// Loads the specified file as a sprite or texture.
         /// </summary>
         public static Sprite GetCustomSprite(string file, float pixelsPerUnit = 100f)
         {
-            Texture2D texture = GetTexture();
+            Texture2D texture = GetTexture(file);
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
+        }
+        public static Texture2D GetTexture(string file)
+        {
+            // Set up a new texture using point filtering.
+            Texture2D texture = new(32, 32) { filterMode = FilterMode.Point };
 
-            Texture2D GetTexture()
-            {
-                // Set up a new texture using point filtering.
-                Texture2D texture = new(32, 32) { filterMode = FilterMode.Point };
+            // Read the sprite for this texture.
+            texture.LoadImage(File.ReadAllBytes(file));
 
-                // Read the sprite for this texture.
-                texture.LoadImage(File.ReadAllBytes(file));
-
-                // Return our custom texture.
-                return texture;
-            }
+            // Return our custom texture.
+            return texture;
         }
     }
 }
