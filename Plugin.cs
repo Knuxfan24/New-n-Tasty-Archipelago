@@ -111,7 +111,6 @@ namespace NNT_Archipealgo
             // Patch all the functions that need patching.
             Harmony.CreateAndPatchAll(typeof(AbePatcher));
             Harmony.CreateAndPatchAll(typeof(AppPatcher));
-            Harmony.CreateAndPatchAll(typeof(LEDScreenPatcher));
             Harmony.CreateAndPatchAll(typeof(MainMenuPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonListPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonSlavePatcher));
@@ -120,6 +119,7 @@ namespace NNT_Archipealgo
             Harmony.CreateAndPatchAll(typeof(TrialZulagLocationSender));
 
             Harmony.CreateAndPatchAll(typeof(DisableAbilities));
+            Harmony.CreateAndPatchAll(typeof(JokeMessages));
             Harmony.CreateAndPatchAll(typeof(LockedSprites));
         }
 
