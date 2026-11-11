@@ -29,30 +29,36 @@ namespace NNT_Archipealgo.Patchers
             }
         }
 
+        /// <summary>
+        /// Handles Mudokons dying.
+        /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonSlave), "DeathBackEnter")]
-        static void DeathBackEnter() => RingLinkLoss();
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonSlave), "DeathChokeEnter")]
-        static void DeathChokeEnter() => RingLinkLoss();
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonSlave), "DeathFrontEnter")]
-        static void DeathFrontEnter() => RingLinkLoss();
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonSlave), "DeathGibEnter")]
-        static void DeathGibEnter() => RingLinkLoss();
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonSlave), "DeathZapEnter")]
-        static void DeathZapEnter() => RingLinkLoss();
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(MudokonSlave), "DeathZapGibEnter")]
-        static void DeathZapGibEnter() => RingLinkLoss();
-
-        /// <summary>
-        /// Sends out a single negative RingLink packet if a Mudokon dies.
-        /// </summary>
-        static void RingLinkLoss()
+        static void MudokonDeath(MudokonSlave __instance)
         {
+            // Check if we're doing a genocide run and send the location for this Mudokon if so.
+            if ((long)Plugin.slotData["genocide"] != 0)
+            {
+                // Send the location for this Mudokon.
+                Helpers.CompleteLocationCheck(__instance.ID);
+
+                // Loop through this Mudokon's object to find the Archipelago indicator and destroy it if it exists (as it otherwise persists through checkpoint reloads).
+                for (int childIndex = __instance.transform.childCount - 1; childIndex >= 0; childIndex--)
+                {
+                    if (__instance.transform.GetChild(childIndex).name == "AP Indicator")
+                    {
+                        GameObject.Destroy(__instance.transform.GetChild(childIndex).gameObject);
+                        break;
+                    }
+                }
+            }
+
+            // Send out a single negative RingLink packet.
             if ((long)Plugin.slotData["ring_link"] != 0)
                 Plugin.RingLinkMudokonCount--;
         }

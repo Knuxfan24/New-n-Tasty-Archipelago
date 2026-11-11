@@ -24,7 +24,7 @@ using Color = UnityEngine.Color;
 
 namespace NNT_Archipealgo
 {
-    [BepInPlugin("K24_NNT_Archipelago", "Archipelago", "1.0.1")]
+    [BepInPlugin("K24_NNT_Archipelago", "Archipelago", "1.1.0")]
     public class Plugin : BaseUnityPlugin
     {
         // Logger.
@@ -238,8 +238,9 @@ namespace NNT_Archipealgo
                     // Push our connected message to the string queue.
                     infoStringQueue.Add($"Connected to {configServerAddress.Value} as {configSlotName.Value}");
 
-                    // Get the slot data and debug print it.
+                    // Get the slot data (add the genocide entry if its missing for some semblence of backwards compatibility) and debug print it.
                     slotData = connectionSuccess.SlotData;
+                    if (!slotData.ContainsKey("genocide")) slotData.Add("genocide", 0L);
                     foreach (var key in slotData)
                         consoleLog.LogDebug($"{key.Key}: {key.Value} (Type: {key.Value.GetType()})");
 

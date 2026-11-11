@@ -79,7 +79,7 @@ namespace NNT_Archipealgo
                         UnlockElement(portal.transform);
                     break;
 
-                case "Rescued Mudokon": Plugin.save.MudokonCount += item.Value; break;
+                case "Rescued Mudokon": case "Mudokon Pop": Plugin.save.MudokonCount += item.Value; break;
 
                 case "Rupture Farms": Plugin.save.UnlockedLocations[0] = true; break;
                 case "Stockyards": Plugin.save.UnlockedLocations[1] = true; break;

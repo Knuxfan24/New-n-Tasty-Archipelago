@@ -7,6 +7,7 @@ namespace NNT_Archipealgo.Patchers
     {
         /// <summary>
         /// Sets the required Mudokon count for the good ending to -1, forcing it to always play that one.
+        /// TODO: Change this so that genocide runs force the bad ending instead.
         /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(App), "Start")]

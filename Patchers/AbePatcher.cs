@@ -9,6 +9,7 @@ namespace NNT_Archipealgo.Patchers
         private static readonly MethodInfo dropItem = typeof(Abe).GetMethod("DropPickUp", BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly MethodInfo chantParticles = typeof(Abe).GetMethod("DestroyChantParticles", BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly MethodInfo sligState = typeof(Slig).GetMethod("EnqueueState", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(SMStates) }, null);
+        private static readonly MethodInfo speak = typeof(Abe).GetMethod("Speak", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /// <summary>
         /// Holds a reference to the player's object.
@@ -129,6 +130,38 @@ namespace NNT_Archipealgo.Patchers
 
             // Reset the DeathLink amnesty.
             deathLinkAmnesty = (int)(long)Plugin.slotData["death_link_amnesty"];
+        }
+
+        /// <summary>
+        /// Make Abe laugh instead of saying a Whoops line upon a Mudokon dying in a genocide run.
+        /// TODO: This is a bit wonky, the initial plan was to hijack the PostEvent method, but trying to apply a Harmony patch to the AkSoundEngine just made the plugin fail to load at all...
+        /// </summary>
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Abe), "Update")]
+        static void GenocideLaughTest(Abe __instance, ref float ___m_MudDeathResponseCooldown, ref float ___m_MudDeathResponseTrigger)
+        {
+            // Only do this in a genocide run.
+            if ((long)Plugin.slotData["genocide"] == 0) return;
+
+            // Replicate some of the original update function, but swapping out the call to Play_vox_abe_oops with Play_vox_abe_laugh.
+            if (__instance.IsActiveInGameplay())
+            {
+                if (___m_MudDeathResponseCooldown > 0f)
+                    ___m_MudDeathResponseCooldown -= Time.deltaTime;
+
+                else if (___m_MudDeathResponseTrigger > 0f)
+                {
+                    ___m_MudDeathResponseTrigger -= Time.deltaTime;
+                    if (___m_MudDeathResponseTrigger <= 0f && !__instance.Dead)
+                    {
+                        speak.Invoke(__instance, new object[] { });
+                        Ear2.GetInstance().PostWord(Ear2.Word.AbeLaugh, __instance.transform);
+                        AkSoundEngine.PostEvent("Play_vox_abe_laugh", __instance.gameObject);
+                        ___m_MudDeathResponseCooldown = 3f;
+                        ___m_MudDeathResponseTrigger = 0f;
+                    }
+                }
+            }
         }
 
         /// <summary>

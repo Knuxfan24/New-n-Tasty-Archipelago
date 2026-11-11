@@ -6,8 +6,8 @@
         [HarmonyPatch(typeof(Portal), "OpenExecute")]
         static void RescueMudokon(Portal __instance, ref List<Transform> ___m_lstEnteringCharacters)
         {
-            // Don't bother doing this if we're in The Boardroom.
-            if (App.getInstance().GetCurrentLevelName().Contains("Boardroom")) return;
+            // Don't bother doing this if we're in The Boardroom or doing a genocide run.
+            if (App.getInstance().GetCurrentLevelName().Contains("Boardroom") || (long)Plugin.slotData["genocide"] == 1) return;
 
             // Check that this portal is processing a rescuable Mudokon and that Abe is... Alive.
             if (__instance.type == Portal.Type.Slave && !App.abe.Dead)

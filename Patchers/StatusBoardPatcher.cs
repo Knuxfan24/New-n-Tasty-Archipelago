@@ -77,9 +77,10 @@ namespace NNT_Archipealgo.Patchers
             ___lines[0].text = "Locations:";
             ___lines[3].text = Plugin.save.RemainingLocations.ToString();
 
-            // Set the third line to the count of rescued Mudokons, using the original Escapees string.
+            // Set the third line to the count of rescued Mudokons, using the original Escapees string (swap it to Casualties in a genocide run).
             ___lines[2].text = LanguageManager.GetText("env_statusboard_escapees") + ":";
             ___lines[5].text = $"{Plugin.save.MudokonCount}/{Plugin.slotData["required_muds"]}";
+            if ((long)Plugin.slotData["genocide"] != 0) ___lines[2].text = LanguageManager.GetText("env_statusboard_casualties") + ":";
 
             // If the timer is below 0, then set the second line to our random strings and return.
             if (genericTimer < 0)
