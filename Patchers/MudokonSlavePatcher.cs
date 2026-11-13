@@ -33,12 +33,7 @@ namespace NNT_Archipealgo.Patchers
         /// Handles Mudokons dying.
         /// </summary>
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(MudokonSlave), "DeathBackEnter")]
-        [HarmonyPatch(typeof(MudokonSlave), "DeathChokeEnter")]
-        [HarmonyPatch(typeof(MudokonSlave), "DeathFrontEnter")]
-        [HarmonyPatch(typeof(MudokonSlave), "DeathGibEnter")]
-        [HarmonyPatch(typeof(MudokonSlave), "DeathZapEnter")]
-        [HarmonyPatch(typeof(MudokonSlave), "DeathZapGibEnter")]
+        [HarmonyPatch(typeof(MudokonSlave), "Kill")]
         static void MudokonDeath(MudokonSlave __instance)
         {
             // Check if we're doing a genocide run and send the location for this Mudokon if so.
