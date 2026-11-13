@@ -62,11 +62,15 @@ namespace NNT_Archipealgo.Patchers
                 // If we're not using Extra Area Clears, then set the NOT IN SEED value on the unused areas.
                 if ((button.m_eChapter is LevelList.Chapters.MonsaicLines or
                                          LevelList.Chapters.Paramonia or
-                                         LevelList.Chapters.ParamonianNests or
                                          LevelList.Chapters.Scrabania or
-                                         LevelList.Chapters.ScrabanianNests or
                                          LevelList.Chapters.FreeFireZone) &&
                                          ((long)Plugin.slotData["area_clears"] == 0 || (long)Plugin.slotData["extra_area_clears"] == 0))
+                    button.m_cJAWMenuLocalisation.SetKey("AP_NotInSeed");
+
+                // The Nests are part of the standard area clears, so check for them seperately.
+                if ((button.m_eChapter is LevelList.Chapters.ParamonianNests or
+                                         LevelList.Chapters.ScrabanianNests &&
+                                         ((long)Plugin.slotData["area_clears"] == 0)))
                     button.m_cJAWMenuLocalisation.SetKey("AP_NotInSeed");
 
                 // Set the NOT IN SEED value on the unused goal area.
