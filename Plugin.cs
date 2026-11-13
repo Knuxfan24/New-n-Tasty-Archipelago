@@ -101,7 +101,7 @@ namespace NNT_Archipealgo
             configJokeSigns = Config.Bind("Joke Signs",
                                           "Enabled",
                                           true,
-                                          "Replaces the scrolling signs in Rupture Farms with jokes referencing memes and other games.");
+                                          "Replaces the scrolling signs in Rupture Farms and the fireflies with jokes referencing memes and other games.");
 
             configJokeSignsTutorials = Config.Bind("Joke Signs",
                                                    "Include Tutorial Signs",
@@ -410,7 +410,7 @@ namespace NNT_Archipealgo
                     }
                     catch (Exception ex)
                     {
-                        consoleLog?.LogWarning($"Location send failed: {ex.Message}");
+                        consoleLog?.LogError($"Location send failed: {ex.Message}");
                     }
                 }
             }
@@ -503,7 +503,7 @@ namespace NNT_Archipealgo
                     }
                     catch (Exception ex)
                     {
-                        consoleLog?.LogWarning($"Bounce send failed: {ex.Message}");
+                        consoleLog?.LogError($"Bounce send failed: {ex.Message}");
                     }
                 }
             }

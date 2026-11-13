@@ -119,7 +119,7 @@ namespace NNT_Archipealgo.Patchers
                 case TakeDamageMessage.Types.SwingingRock: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got smacked by a rock."; break;
                 case TakeDamageMessage.Types.SlingShot: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} took a slingshot to the face."; break;
                 case TakeDamageMessage.Types.FallingMeat: reason = $"{Plugin.session.Players.GetPlayerName(Plugin.session.ConnectionInfo.Slot)} got a concussion."; break;
-                default: Plugin.consoleLog.LogWarning($"Death Type {cTakeDamageMessage.Type} not handled for unique message!"); break; // In theory only Depossession and Shrykull don't have a message, which Abe shouldn't ever be killed by?
+                default: Plugin.consoleLog.LogError($"Death Type {cTakeDamageMessage.Type} not handled for unique message!"); break; // In theory only Depossession and Shrykull don't have a message, which Abe shouldn't ever be killed by?
             }
 
             // Send a DeathLink with our reason.

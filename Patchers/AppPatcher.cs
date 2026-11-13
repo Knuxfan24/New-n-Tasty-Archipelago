@@ -65,7 +65,7 @@ namespace NNT_Archipealgo.Patchers
                 case LevelList.Chapters.Alf: __result = Plugin.save.MudokonCount >= (long)Plugin.slotData["required_muds"] && (long)Plugin.slotData["goal"] == 1; return false;
 
                 default:
-                    Plugin.consoleLog.LogWarning($"Handling for {eChapter} not implemented!"); __result = false; return false;
+                    Plugin.consoleLog.LogError($"Handling for {eChapter} not implemented!"); __result = false; return false;
             }
         }
 
