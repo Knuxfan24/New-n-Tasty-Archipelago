@@ -19,6 +19,10 @@ namespace NNT_Archipealgo.CustomData
 
         public bool[] UnlockedLocations { get; set; } = new bool[9];
 
+        public bool[] ParamoniaBellSongs { get; set; } = new bool[6];
+        public bool[] ScrabaniaBellSongs { get; set; } = new bool[8];
+        public bool MonsaicLinesBellSong { get; set; }
+
         public Dictionary<long, ScoutedItemInfo> items;
     }
 }

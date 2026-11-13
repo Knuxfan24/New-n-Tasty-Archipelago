@@ -111,6 +111,8 @@ namespace NNT_Archipealgo
             // Patch all the functions that need patching.
             Harmony.CreateAndPatchAll(typeof(AbePatcher));
             Harmony.CreateAndPatchAll(typeof(AppPatcher));
+            Harmony.CreateAndPatchAll(typeof(ChimeBellsPatcher));
+            Harmony.CreateAndPatchAll(typeof(DirectoryStoryStonePatcher));
             Harmony.CreateAndPatchAll(typeof(MainMenuPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonListPatcher));
             Harmony.CreateAndPatchAll(typeof(MudokonSlavePatcher));
@@ -238,9 +240,10 @@ namespace NNT_Archipealgo
                     // Push our connected message to the string queue.
                     infoStringQueue.Add($"Connected to {configServerAddress.Value} as {configSlotName.Value}");
 
-                    // Get the slot data (add the genocide entry if its missing for some semblence of backwards compatibility) and debug print it.
+                    // Get the slot data (add the post 1.0 tags if they're missing for some semblence of backwards compatibility) and debug print it.
                     slotData = connectionSuccess.SlotData;
                     if (!slotData.ContainsKey("genocide")) slotData.Add("genocide", 0L);
+                    if (!slotData.ContainsKey("bell_song_items")) slotData.Add("bell_song_items", 0L);
                     foreach (var key in slotData)
                         consoleLog.LogDebug($"{key.Key}: {key.Value} (Type: {key.Value.GetType()})");
 

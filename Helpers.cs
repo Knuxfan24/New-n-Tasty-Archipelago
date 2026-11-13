@@ -79,6 +79,24 @@ namespace NNT_Archipealgo
                         UnlockElement(portal.transform);
                     break;
 
+                case "Paramonian Trial 1 Bell Song": Plugin.save.ParamoniaBellSongs[0] = true; break;
+                case "Paramonian Trial 2 Bell Song": Plugin.save.ParamoniaBellSongs[1] = true; break;
+                case "Paramonian Trial 3 Bell Song": Plugin.save.ParamoniaBellSongs[2] = true; break;
+                case "Paramonian Trial 4 Bell Song": Plugin.save.ParamoniaBellSongs[3] = true; break;
+                case "Paramonian Trial 5 Bell Song": Plugin.save.ParamoniaBellSongs[4] = true; break;
+                case "Paramonian Trial 6 Bell Song": Plugin.save.ParamoniaBellSongs[5] = true; break;
+
+                case "Scrabanian Trial 1 Bell Song": Plugin.save.ScrabaniaBellSongs[0] = true; break;
+                case "Scrabanian Trial 2 Bell Song": Plugin.save.ScrabaniaBellSongs[1] = true; break;
+                case "Scrabanian Trial 3 Bell Song": Plugin.save.ScrabaniaBellSongs[2] = true; break;
+                case "Scrabanian Trial 4 Bell Song": Plugin.save.ScrabaniaBellSongs[3] = true; break;
+                case "Scrabanian Trial 5 Bell Song": Plugin.save.ScrabaniaBellSongs[4] = true; break;
+                case "Scrabanian Trial 6 Bell Song": Plugin.save.ScrabaniaBellSongs[5] = true; break;
+                case "Scrabanian Trial 7 Bell Song": Plugin.save.ScrabaniaBellSongs[6] = true; break;
+                case "Scrabanian Trial 8 Bell Song": Plugin.save.ScrabaniaBellSongs[7] = true; break;
+
+                case "Monsaic Lines Bell Song": Plugin.save.MonsaicLinesBellSong = true; break;
+
                 case "Rescued Mudokon": case "Mudokon Pop": Plugin.save.MudokonCount += item.Value; break;
 
                 case "Rupture Farms": Plugin.save.UnlockedLocations[0] = true; break;
