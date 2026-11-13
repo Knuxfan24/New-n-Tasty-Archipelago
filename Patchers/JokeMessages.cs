@@ -83,8 +83,8 @@ namespace NNT_Archipealgo.Patchers
             new("i showed you my cacodemon plz respond"), // Reference to Doom.
             new("Message from Ghandi: Our words are backed by nuclear weapons!"), // Reference to Civilization.
             new("You offer to the shrine, but gain nothing."), // Reference to Risk of Rain 2.
-            new("AURORA BOREALIS?!    At this time of year? At this time of day? In this part of the mutliworld? nLocalised entirely within your slot data?!", Type.Board), // Reference to that Simpsons meme.
-            new("AURORA BOREALIS?! At this time of year? At this time of day? In this part of the mutliworld? nLocalised entirely within your slot data?!", Type.Board), // Reference to that Simpsons meme.
+            new("AURORA BOREALIS?!    At this time of year? At this time of day? In this part of the mutliworld? Localised entirely within your slot data?!", Type.Board), // Reference to that Simpsons meme.
+            new("AURORA BOREALIS?! At this time of year? At this time of day? In this part of the mutliworld? Localised entirely within your slot data?!", Type.Board), // Reference to that Simpsons meme.
             new("Dear {$}. Please come to the castle. I've baked a cake for you. Yours truly-- Princess Toadstool", [PlaceholderTypes.OurName]), // Reference to Super Mario 64.
             new("{$} has died in an accident on Steeplechase 1!", [PlaceholderTypes.RandomName]), // Reference to OpenRCT2.
             new("Adam has yet to authorise reading of this sign."), // Reference to Metroid: Other M.
